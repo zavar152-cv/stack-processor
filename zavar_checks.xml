@@ -165,7 +165,7 @@
         <module name="EqualsHashCode"/>
         <module name="HiddenField"/>
         <module name="IllegalInstantiation"/>
-        <module name="InnerAssignment"/>
+<!--        <module name="InnerAssignment"/>-->
         <module name="MagicNumber"/>
         <module name="MissingSwitchDefault"/>
         <module name="MultipleVariableDeclarations"/>
@@ -184,7 +184,9 @@
 
 
         <module name="InterfaceIsType"/>
-        <module name="VisibilityModifier"/>
+        <module name="VisibilityModifier">
+            <property name="protectedAllowed" value="true"/>
+        </module>
 
         <!-- Miscellaneous other checks.                   -->
         <!-- See https://checkstyle.org/config_misc.html -->

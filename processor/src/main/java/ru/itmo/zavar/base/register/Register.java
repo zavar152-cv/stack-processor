@@ -1,4 +1,4 @@
-package ru.itmo.zavar.base;
+package ru.itmo.zavar.base.register;
 
 import lombok.RequiredArgsConstructor;
 import ru.itmo.zavar.exception.RegisterConstraintException;
