@@ -25,7 +25,7 @@ public final class DataPath {
     private final Register<Long> tos = new Register<>(Long.MAX_VALUE, Long.MIN_VALUE);
     private final Register<Integer> ip;
     private boolean negativeFlag;
-    private boolean zeroFlag;
+    private boolean zeroFlag; //TODO
 
     public DataPath(final Register<Integer> ipRegister, final Integer inputAddress, final Integer outputAddress) {
         ip = ipRegister;
@@ -85,6 +85,8 @@ public final class DataPath {
     public void writeTos() throws InvalidMuxSelectionException {
         if (aluOutputMux == AluOutputMux.TO_TOS) {
             tos.writeValue(alu.getOutput());
+            zeroFlag = alu.getOutput() == 0;
+            negativeFlag = alu.getOutput() < 0;
         } else {
             throw new InvalidMuxSelectionException("Select TO_TOS to write in TOS");
         }
@@ -136,6 +138,14 @@ public final class DataPath {
         } else {
             throw new InvalidMuxSelectionException("Select FROM_RS to read from RS");
         }
+    }
+
+    public boolean isZeroFlag() {
+        return zeroFlag;
+    }
+
+    public boolean isNegativeFlag() {
+        return negativeFlag;
     }
 
 }
