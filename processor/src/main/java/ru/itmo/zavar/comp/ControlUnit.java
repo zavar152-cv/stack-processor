@@ -19,6 +19,7 @@ public final class ControlUnit {
     private final Register<Byte> tc = new Register<>((byte) 16, (byte) 0);
     private Long controlUnitTicks;
     private boolean stopped = true;
+    private String stage; //TODO remove
 
     public ControlUnit(final ArrayList<Long> program) {
         final Byte dataBits = 31; // 32 bits, signed
@@ -39,7 +40,10 @@ public final class ControlUnit {
         controlUnitTicks = 0L;
         while (!stopped) {
             resetTick();
+            stage = "Fetch";
             fetchNextInstruction();
+            resetTick();
+            stage = "Execute";
             execute();
         }
     }
@@ -59,7 +63,11 @@ public final class ControlUnit {
 
     private void onEveryControlUnitTick() {
         controlUnitTicks++;
-        System.out.println("Tick: " + controlUnitTicks);
+        System.out.print("Tick: " + controlUnitTicks);
+        System.out.print(", TC: " + readTick());
+        System.out.print(", Stage: " + stage);
+        System.out.print(", CR: " + cr.readValue() + " {" + InstructionCode.valueByBinary(Integer.toBinaryString(cr.readValue())) + "}");
+        System.out.println(", IP: " + ip.readValue());
     }
 
     /**
@@ -97,7 +105,10 @@ public final class ControlUnit {
 
     private void execute() {
         switch (InstructionCode.valueByBinary(Integer.toBinaryString(cr.readValue()))) {
-            case HALT -> stopped = true; // TODO incTick????
+            case HALT -> {
+                stopped = true;
+                incTick();
+            }
             case ADD -> {
                 dataPath.selectLalu(LeftAluInputMux.FROM_DS);
                 dataPath.selectRalu(RightAluInputMux.FROM_TOS);
