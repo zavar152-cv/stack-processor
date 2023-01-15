@@ -8,10 +8,13 @@ public enum AluOperation {
     AND,
     OR,
     XOR,
-    NOT,
     EQ,
     GR,
     LE,
     RIGHT,
-    LEFT
+    LEFT,
+    LEFT_NOT,
+    RIGHT_NOT,
+    RIGHT_INC,
+    LEFT_INC
 }

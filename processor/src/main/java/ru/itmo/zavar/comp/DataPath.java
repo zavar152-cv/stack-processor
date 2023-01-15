@@ -25,12 +25,14 @@ public final class DataPath {
     private final Register<Long> tos = new Register<>(Long.MAX_VALUE, Long.MIN_VALUE);
     private final Register<Integer> ip;
     private boolean negativeFlag;
-    private boolean zeroFlag; //TODO
+    private boolean zeroFlag;
 
-    public DataPath(final Register<Integer> ipRegister, final Integer inputAddress, final Integer outputAddress) {
+    public DataPath(final Register<Integer> ipRegister, final Integer inputAddress, final Integer outputAddress,
+                    final Integer memorySize, final Byte bits) {
         ip = ipRegister;
-        Memory dataMemory = new Memory(1024, (byte) 64);
-        dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress), new OutputDevice(outputAddress));
+        Memory dataMemory = new Memory(memorySize, bits);
+        dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress),
+                new OutputDevice(outputAddress));
     }
 
     public void selectOp(final AluOperation operation) {
@@ -140,11 +142,11 @@ public final class DataPath {
         }
     }
 
-    public boolean isZeroFlag() {
+    public boolean zeroFlag() {
         return zeroFlag;
     }
 
-    public boolean isNegativeFlag() {
+    public boolean negativeFlag() {
         return negativeFlag;
     }
 

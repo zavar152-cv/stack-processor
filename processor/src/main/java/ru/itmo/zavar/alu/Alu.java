@@ -22,12 +22,15 @@ public final class Alu {
             case AND -> output = rightInput & leftInput;
             case OR -> output = rightInput | leftInput;
             case XOR -> output = rightInput ^ leftInput;
-            case NOT -> output = ~rightInput;
+            case RIGHT_NOT -> output = ~rightInput;
+            case LEFT_NOT -> output = ~leftInput;
             case EQ -> output = rightInput.equals(leftInput) ? 1L : 0L;
             case GR -> output = rightInput > leftInput ? 1L : 0L;
             case LE -> output = rightInput < leftInput ? 1L : 0L;
             case RIGHT -> output = rightInput;
             case LEFT -> output = leftInput;
+            case RIGHT_INC -> output = rightInput + 1;
+            case LEFT_INC -> output = leftInput + 1;
             default -> throw new UnsupportedOperationException();
         }
     }

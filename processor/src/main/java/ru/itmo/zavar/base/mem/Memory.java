@@ -31,7 +31,7 @@ public sealed class Memory permits ProtectedMemory {
             throw new MemoryCellConstraintException("Provided value %s is greater than max %s".formatted(value, constraint));
         }
         if (value < -constraint) {
-            throw new MemoryCellConstraintException("Provided value %s is les than min %s".formatted(value, constraint));
+            throw new MemoryCellConstraintException("Provided value %s is less than min %s".formatted(value, constraint));
         }
         memory.set(addressRegistry.readValue(), value);
     }
