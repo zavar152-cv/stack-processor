@@ -33,6 +33,8 @@ public final class DataPath {
         Memory dataMemory = new Memory(memorySize, bits);
         dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress),
                 new OutputDevice(outputAddress));
+        dataStack.push(13L);
+        tos.writeValue(2L);
     }
 
     public void selectOp(final AluOperation operation) {

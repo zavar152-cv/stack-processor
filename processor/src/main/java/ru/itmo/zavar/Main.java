@@ -2,6 +2,9 @@ package ru.itmo.zavar;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.itmo.zavar.comp.ControlUnit;
+
+import java.util.ArrayList;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Main {
@@ -17,5 +20,13 @@ public class Main {
         System.out.println(Integer.toBinaryString((int) (i & 16777215))); // extract address
 
         System.out.println(Integer.toBinaryString((int) (i >> 24))); // extract command code
+
+        ArrayList<Long> program = new ArrayList<>();
+        program.add(InstructionCode.ADD.getBinary().longValue() << 24);
+        program.add(InstructionCode.HALT.getBinary().longValue() << 24);
+        ControlUnit controlUnit = new ControlUnit(program);
+        controlUnit.start();
+        System.out.println("lol");
+
     }
 }

@@ -1,8 +1,10 @@
 package ru.itmo.zavar;
 
-import java.util.Arrays;
-import java.util.Optional;
+import lombok.Getter;
 
+import java.util.Arrays;
+
+@Getter
 public enum InstructionCode {
     HALT("00000000", "HALT"),
     ADD("00000001", "ADD"),
@@ -48,7 +50,7 @@ public enum InstructionCode {
         this.requiredArg = requiredArg;
     }
 
-    public static InstructionCode valueByBinary(String binary) {
+    public static InstructionCode valueByBinary(final String binary) {
         return Arrays.stream(values()).filter(instructionCode -> Integer.toBinaryString(instructionCode.binary)
                 .equals(binary)).findFirst().orElse(null);
     }

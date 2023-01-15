@@ -5,6 +5,7 @@ import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.alu.AluOperation;
 import ru.itmo.zavar.base.mem.ProtectedMemory;
 import ru.itmo.zavar.base.mux.AluOutputMux;
+import ru.itmo.zavar.base.mux.LeftAluInputMux;
 import ru.itmo.zavar.base.mux.RightAluInputMux;
 import ru.itmo.zavar.base.register.Register;
 
@@ -26,6 +27,9 @@ public final class ControlUnit {
         final Integer dataMemorySize = 2048;
         final Integer inputAddress = 1;
         final Integer outputAddress = 0;
+        ip.writeValue(0);
+        cr.writeValue(InstructionCode.NOPE.getBinary());
+        resetTick();
         dataPath = new DataPath(ip, inputAddress, outputAddress, dataMemorySize, dataBits);
         programMemory = new ProtectedMemory(programMemorySize, programBits, program);
     }
@@ -85,7 +89,9 @@ public final class ControlUnit {
         incTick();
         dataPath.selectRalu(RightAluInputMux.FROM_IP);
         dataPath.selectOut(AluOutputMux.TO_IP);
+        dataPath.readIp();
         dataPath.selectOp(AluOperation.RIGHT_INC); // IP ← IP + 1
+        dataPath.writeIp();
         incTick();
     }
 
@@ -93,6 +99,14 @@ public final class ControlUnit {
         switch (InstructionCode.valueByBinary(Integer.toBinaryString(cr.readValue()))) {
             case HALT -> stopped = true; // TODO incTick????
             case ADD -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.PLUS); // TOS ← TOS + POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case SUB -> {
             }
@@ -131,6 +145,7 @@ public final class ControlUnit {
             case FT -> {
             }
             case LIT -> {
+
             }
             case JMP -> {
             }
