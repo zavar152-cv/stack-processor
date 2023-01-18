@@ -22,8 +22,10 @@ public final class Alu {
             case AND -> output = rightInput & leftInput;
             case OR -> output = rightInput | leftInput;
             case XOR -> output = rightInput ^ leftInput;
-            case RIGHT_NOT -> output = ~rightInput;
-            case LEFT_NOT -> output = ~leftInput;
+            case RIGHT_NOT -> output = -rightInput;
+            case RIGHT_BNOT -> output = ~rightInput;
+            case LEFT_NOT -> output = -leftInput;
+            case LEFT_BNOT -> output = ~leftInput;
             case EQ -> output = rightInput.equals(leftInput) ? 1L : 0L;
             case GR -> output = rightInput > leftInput ? 1L : 0L;
             case LE -> output = rightInput < leftInput ? 1L : 0L;

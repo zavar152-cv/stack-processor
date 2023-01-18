@@ -148,40 +148,236 @@ public final class ControlUnit {
                 incTick();
             }
             case SUB -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.MINUS); // TOS ← TOS - POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case MUL -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.MULTIPLY); // TOS ← TOS * POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case DIV -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.DIVIDE); // TOS ← TOS / POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case AND -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.AND); // TOS ← TOS and POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case OR -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.OR); // TOS ← TOS or POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case NOT -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT_NOT); // TOS ← not TOS
+                dataPath.writeTos();
+                incTick();
             }
             case XOR -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.XOR); // TOS ← TOS xor POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case EQ -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.EQ); // TOS ← TOS == POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case GR -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.GR); // TOS ← TOS > POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case LE -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.LE); // TOS ← TOS < POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case DROP -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case DUP -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_DS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // PUSH(DS) ← TOS
+                dataPath.writeDs();
+                incTick();
             }
             case OVER -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_RS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // PUSH(RS) ← TOS
+                dataPath.writeRs();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← POP(DS)
+                dataPath.writeTos();
+                incTick();
+
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_DS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // PUSH(DS) ← TOS
+                dataPath.writeDs();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_RS);
+                dataPath.selectOut(AluOutputMux.TO_DS);
+                dataPath.readRs();
+                dataPath.selectOp(AluOperation.LEFT); // PUSH(DS) ← POP(RS)
+                dataPath.writeDs();
+                incTick();
             }
             case SWAP -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_RS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // PUSH(RS) ← TOS
+                dataPath.writeRs();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← POP(DS)
+                dataPath.writeTos();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_RS);
+                dataPath.selectOut(AluOutputMux.TO_DS);
+                dataPath.readRs();
+                dataPath.selectOp(AluOperation.LEFT); // PUSH(DS) ← POP(RS)
+                dataPath.writeDs();
+                incTick();
             }
             case MR -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_RS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // PUSH(RS) ← TOS
+                dataPath.writeRs();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case RM -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_DS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // PUSH(DS) ← TOS
+                dataPath.writeDs();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_RS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readRs();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← POP(RS)
+                dataPath.writeTos();
+                incTick();
             }
             case ST -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_DMAR);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // DMAR ← TOS
+                dataPath.writeDmar();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectOut(AluOutputMux.TO_DATA);
+                dataPath.readDs();
+                dataPath.selectOp(AluOperation.LEFT); // DMEMORY ← POP(DS)
+                dataPath.writeMem();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case FT -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_DMAR);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // DMAR ← TOS
+                dataPath.writeDmar();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_DATA);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.oeMem();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← DMEMORY
+                dataPath.writeTos();
+                incTick();
             }
             case LIT -> {
                 dataPath.selectLalu(LeftAluInputMux.FROM_AR);
