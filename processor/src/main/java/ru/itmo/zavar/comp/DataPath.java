@@ -29,8 +29,8 @@ public final class DataPath {
     private boolean negativeFlag;
     private boolean zeroFlag;
 
-    public DataPath(final ArrayList<Long> data, final Register<Integer> ipRegister, final Register<Integer> arRegister, final Integer inputAddress, final Integer outputAddress,
-                    final Integer memorySize, final Byte bits) {
+    public DataPath(final ArrayList<Long> data, final Register<Integer> ipRegister, final Register<Integer> arRegister, final Integer inputAddress,
+                    final Integer outputAddress, final Integer memorySize, final Byte bits) {
         ip = ipRegister;
         ar = arRegister;
         Memory dataMemory = new Memory(memorySize, bits, data);

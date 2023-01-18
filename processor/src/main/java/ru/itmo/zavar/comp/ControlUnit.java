@@ -1,7 +1,5 @@
 package ru.itmo.zavar.comp;
 
-import net.sf.saxon.expr.instruct.Instruction;
-import org.checkerframework.checker.units.qual.A;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.alu.AluOperation;
 import ru.itmo.zavar.base.mem.ProtectedMemory;
@@ -9,6 +7,7 @@ import ru.itmo.zavar.base.mux.AluOutputMux;
 import ru.itmo.zavar.base.mux.LeftAluInputMux;
 import ru.itmo.zavar.base.mux.RightAluInputMux;
 import ru.itmo.zavar.base.register.Register;
+import ru.itmo.zavar.log.TickLog;
 
 import java.util.ArrayList;
 
@@ -22,6 +21,8 @@ public final class ControlUnit {
     private Long controlUnitTicks;
     private boolean stopped = true;
     private Stage stage;
+    private final int opcodeOffset = 24;
+    private final ArrayList<TickLog> tickLogs = new ArrayList<>();
 
     public ControlUnit(final ArrayList<Long> program, final ArrayList<Long> data) {
         final Byte dataBits = 31; // 32 bits, signed
@@ -46,7 +47,7 @@ public final class ControlUnit {
             stage = Stage.FETCH;
             fetchNextInstruction();
             resetTick();
-            if(Long.toBinaryString(cr.readValue() >> 25).charAt(0) == '1') {
+            if (Long.toBinaryString(cr.readValue() >> opcodeOffset + 1).charAt(0) == '1') {
                 stage = Stage.ADDRESS;
                 fetchAr();
                 resetTick();
@@ -71,13 +72,15 @@ public final class ControlUnit {
 
     private void onEveryControlUnitTick() {
         controlUnitTicks++;
-        System.out.print("Tick: " + controlUnitTicks);
-        System.out.print(", TC: " + readTick());
-        System.out.print(", Stage: " + stage);
-        System.out.print(", CR: " + (cr.readValue() >> 24) + " {" + InstructionCode.valueByBinary(Long.toBinaryString(cr.readValue() >> 24)) + "}");
-        System.out.print(", IP: " + ip.readValue());
-        System.out.print(", AR: " + ar.readValue());
-        System.out.println(", TOS: " + dataPath.getTosValue());
+        TickLog tickLog = new TickLog(controlUnitTicks, readTick(), stage, (cr.readValue() >> opcodeOffset),
+                InstructionCode.valueByBinary(Long.toBinaryString(cr.readValue() >> opcodeOffset)), ip.readValue(),
+                ar.readValue(), dataPath.getTosValue());
+        tickLog.print();
+        tickLogs.add(tickLog);
+    }
+
+    public ArrayList<TickLog> getTickLog() {
+        return tickLogs;
     }
 
     /**
@@ -109,7 +112,8 @@ public final class ControlUnit {
      * AR ← CR (0..23)
      */
     private void fetchAr() {
-        ar.writeValue((int) (cr.readValue() & 16777215));
+        final int addressMask = 16777215;
+        ar.writeValue((int) (cr.readValue() & addressMask));
         incTick();
     }
 
@@ -128,7 +132,7 @@ public final class ControlUnit {
     }
 
     private void execute() {
-        switch (InstructionCode.valueByBinary(Long.toBinaryString(cr.readValue() >> 24))) {
+        switch (InstructionCode.valueByBinary(Long.toBinaryString(cr.readValue() >> opcodeOffset))) {
             case HALT -> {
                 stopped = true;
                 incTick();
@@ -219,10 +223,6 @@ public final class ControlUnit {
             }
         }
         System.out.println();
-    }
-
-    private enum Stage {
-        FETCH, EXECUTE, ADDRESS
     }
 
 }
