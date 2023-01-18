@@ -23,7 +23,7 @@ public final class ControlUnit {
     private boolean stopped = true;
     private Stage stage;
 
-    public ControlUnit(final ArrayList<Long> program) {
+    public ControlUnit(final ArrayList<Long> program, final ArrayList<Long> data) {
         final Byte dataBits = 31; // 32 bits, signed
         final Byte programBits = 32; // 32 bits, unsigned
         final Integer programMemorySize = 16777215; // [2^24 - 1; 0]
@@ -34,7 +34,7 @@ public final class ControlUnit {
         ar.writeValue(0);
         cr.writeValue(InstructionCode.NOPE.getBinary().longValue());
         resetTick();
-        dataPath = new DataPath(ip, ar, inputAddress, outputAddress, dataMemorySize, dataBits);
+        dataPath = new DataPath(data, ip, ar, inputAddress, outputAddress, dataMemorySize, dataBits);
         programMemory = new ProtectedMemory(programMemorySize, programBits, program);
     }
 
@@ -185,9 +185,6 @@ public final class ControlUnit {
                 dataPath.readAr();
                 dataPath.selectOp(AluOperation.LEFT); // DMAR ← AR
                 dataPath.writeDmar();
-                incTick();
-
-                incIp(); // IP ← IP + 1
                 incTick();
 
                 dataPath.selectRalu(RightAluInputMux.FROM_TOS);

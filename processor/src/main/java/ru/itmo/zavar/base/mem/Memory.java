@@ -22,6 +22,14 @@ public sealed class Memory permits ProtectedMemory {
         constraint = (long) Math.pow(2, bits);
     }
 
+    public Memory(final Integer cellsCount, final Byte cellSize, final ArrayList<Long> init) {
+        memory = new ArrayList<>(cellsCount);
+        memory.addAll(0, init);
+        addressRegistry = new Register<>(cellsCount, 0);
+        bits = cellSize;
+        constraint = (long) Math.pow(2, bits);
+    }
+
     public Integer readAR() {
         return addressRegistry.readValue();
     }

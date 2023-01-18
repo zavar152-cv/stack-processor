@@ -12,6 +12,7 @@ import ru.itmo.zavar.exception.InvalidMuxSelectionException;
 import ru.itmo.zavar.io.InputDevice;
 import ru.itmo.zavar.io.OutputDevice;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 public final class DataPath {
@@ -28,19 +29,14 @@ public final class DataPath {
     private boolean negativeFlag;
     private boolean zeroFlag;
 
-    public DataPath(final Register<Integer> ipRegister, final Register<Integer> arRegister, final Integer inputAddress, final Integer outputAddress,
+    public DataPath(final ArrayList<Long> data, final Register<Integer> ipRegister, final Register<Integer> arRegister, final Integer inputAddress, final Integer outputAddress,
                     final Integer memorySize, final Byte bits) {
         ip = ipRegister;
         ar = arRegister;
-        Memory dataMemory = new Memory(memorySize, bits);
-        dataMemory.writeAR(0);
-        dataMemory.write(66L);
-        dataMemory.writeAR(1);
-        dataMemory.write(33L);
+        Memory dataMemory = new Memory(memorySize, bits, data);
+        tos.writeValue(0L);
         dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress),
                 new OutputDevice(outputAddress));
-        dataStack.push(13L);
-        tos.writeValue(2L);
     }
 
     public void selectOp(final AluOperation operation) {
