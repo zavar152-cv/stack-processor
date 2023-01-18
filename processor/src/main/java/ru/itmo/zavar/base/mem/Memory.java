@@ -5,6 +5,7 @@ import ru.itmo.zavar.exception.MemoryCellConstraintException;
 import ru.itmo.zavar.exception.RegisterConstraintException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public sealed class Memory permits ProtectedMemory {
     protected final Register<Integer> addressRegistry;
@@ -13,6 +14,9 @@ public sealed class Memory permits ProtectedMemory {
     protected final Long constraint;
     public Memory(final Integer cellsCount, final Byte cellSize) {
         memory = new ArrayList<>(cellsCount);
+        for(int i = 0; i < cellsCount; i++) {
+            memory.add(0L);
+        }
         addressRegistry = new Register<>(cellsCount, 0);
         bits = cellSize;
         constraint = (long) Math.pow(2, bits);

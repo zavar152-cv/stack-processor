@@ -24,13 +24,19 @@ public final class DataPath {
     private AluOutputMux aluOutputMux;
     private final Register<Long> tos = new Register<>(Long.MAX_VALUE, Long.MIN_VALUE);
     private final Register<Integer> ip;
+    private final Register<Integer> ar;
     private boolean negativeFlag;
     private boolean zeroFlag;
 
-    public DataPath(final Register<Integer> ipRegister, final Integer inputAddress, final Integer outputAddress,
+    public DataPath(final Register<Integer> ipRegister, final Register<Integer> arRegister, final Integer inputAddress, final Integer outputAddress,
                     final Integer memorySize, final Byte bits) {
         ip = ipRegister;
+        ar = arRegister;
         Memory dataMemory = new Memory(memorySize, bits);
+        dataMemory.writeAR(0);
+        dataMemory.write(66L);
+        dataMemory.writeAR(1);
+        dataMemory.write(33L);
         dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress),
                 new OutputDevice(outputAddress));
         dataStack.push(13L);
@@ -104,6 +110,14 @@ public final class DataPath {
         }
     }
 
+    public void readAr() throws InvalidMuxSelectionException {
+        if (leftAluInputMux == LeftAluInputMux.FROM_AR) {
+            alu.setLeftInput(ar.readValue().longValue());
+        } else {
+            throw new InvalidMuxSelectionException("Select FROM_AR to read from AR");
+        }
+    }
+
     public void writeIp() throws InvalidMuxSelectionException {
         if (aluOutputMux == AluOutputMux.TO_IP) {
             ip.writeValue(Math.toIntExact(alu.getOutput()));
@@ -150,6 +164,10 @@ public final class DataPath {
 
     public boolean negativeFlag() {
         return negativeFlag;
+    }
+
+    public Long getTosValue() {
+        return tos.readValue();
     }
 
 }

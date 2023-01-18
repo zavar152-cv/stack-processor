@@ -1,6 +1,7 @@
 package ru.itmo.zavar.comp;
 
 import net.sf.saxon.expr.instruct.Instruction;
+import org.checkerframework.checker.units.qual.A;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.alu.AluOperation;
 import ru.itmo.zavar.base.mem.ProtectedMemory;
@@ -14,12 +15,13 @@ import java.util.ArrayList;
 public final class ControlUnit {
     private final DataPath dataPath;
     private final Register<Integer> ip = new Register<>(16777215, 0); // [2^24 - 1; 0]
+    private final Register<Integer> ar = new Register<>(16777215, 0); // [2^24 - 1; 0]
     private final ProtectedMemory programMemory;
-    private final Register<Short> cr = new Register<>((short) 255, (short) 0); // [2^8 - 1; 0]
+    private final Register<Long> cr = new Register<>(4294967295L, 0L); // [2^32 - 1; 0]
     private final Register<Byte> tc = new Register<>((byte) 16, (byte) 0);
     private Long controlUnitTicks;
     private boolean stopped = true;
-    private String stage; //TODO remove
+    private Stage stage;
 
     public ControlUnit(final ArrayList<Long> program) {
         final Byte dataBits = 31; // 32 bits, signed
@@ -29,9 +31,10 @@ public final class ControlUnit {
         final Integer inputAddress = 1;
         final Integer outputAddress = 0;
         ip.writeValue(0);
-        cr.writeValue(InstructionCode.NOPE.getBinary());
+        ar.writeValue(0);
+        cr.writeValue(InstructionCode.NOPE.getBinary().longValue());
         resetTick();
-        dataPath = new DataPath(ip, inputAddress, outputAddress, dataMemorySize, dataBits);
+        dataPath = new DataPath(ip, ar, inputAddress, outputAddress, dataMemorySize, dataBits);
         programMemory = new ProtectedMemory(programMemorySize, programBits, program);
     }
 
@@ -40,10 +43,15 @@ public final class ControlUnit {
         controlUnitTicks = 0L;
         while (!stopped) {
             resetTick();
-            stage = "Fetch";
+            stage = Stage.FETCH;
             fetchNextInstruction();
             resetTick();
-            stage = "Execute";
+            if(Long.toBinaryString(cr.readValue() >> 25).charAt(0) == '1') {
+                stage = Stage.ADDRESS;
+                fetchAr();
+                resetTick();
+            }
+            stage = Stage.EXECUTE;
             execute();
         }
     }
@@ -66,8 +74,10 @@ public final class ControlUnit {
         System.out.print("Tick: " + controlUnitTicks);
         System.out.print(", TC: " + readTick());
         System.out.print(", Stage: " + stage);
-        System.out.print(", CR: " + cr.readValue() + " {" + InstructionCode.valueByBinary(Integer.toBinaryString(cr.readValue())) + "}");
-        System.out.println(", IP: " + ip.readValue());
+        System.out.print(", CR: " + (cr.readValue() >> 24) + " {" + InstructionCode.valueByBinary(Long.toBinaryString(cr.readValue() >> 24)) + "}");
+        System.out.print(", IP: " + ip.readValue());
+        System.out.print(", AR: " + ar.readValue());
+        System.out.println(", TOS: " + dataPath.getTosValue());
     }
 
     /**
@@ -81,8 +91,26 @@ public final class ControlUnit {
      * СR ← PMEMORY
      */
     private void fetch() {
-        short commandCode = (short) (programMemory.read() >> 24);
-        cr.writeValue(commandCode);
+        cr.writeValue(programMemory.read());
+    }
+
+    /**
+     * IP ← IP + 1
+     */
+    private void incIp() {
+        dataPath.selectRalu(RightAluInputMux.FROM_IP);
+        dataPath.selectOut(AluOutputMux.TO_IP);
+        dataPath.readIp();
+        dataPath.selectOp(AluOperation.RIGHT_INC);
+        dataPath.writeIp();
+    }
+
+    /**
+     * AR ← CR (0..23)
+     */
+    private void fetchAr() {
+        ar.writeValue((int) (cr.readValue() & 16777215));
+        incTick();
     }
 
     /**
@@ -95,16 +123,12 @@ public final class ControlUnit {
         incTick();
         fetch(); // СR ← PMEMORY
         incTick();
-        dataPath.selectRalu(RightAluInputMux.FROM_IP);
-        dataPath.selectOut(AluOutputMux.TO_IP);
-        dataPath.readIp();
-        dataPath.selectOp(AluOperation.RIGHT_INC); // IP ← IP + 1
-        dataPath.writeIp();
+        incIp(); // IP ← IP + 1
         incTick();
     }
 
     private void execute() {
-        switch (InstructionCode.valueByBinary(Integer.toBinaryString(cr.readValue()))) {
+        switch (InstructionCode.valueByBinary(Long.toBinaryString(cr.readValue() >> 24))) {
             case HALT -> {
                 stopped = true;
                 incTick();
@@ -156,7 +180,29 @@ public final class ControlUnit {
             case FT -> {
             }
             case LIT -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_AR);
+                dataPath.selectOut(AluOutputMux.TO_DMAR);
+                dataPath.readAr();
+                dataPath.selectOp(AluOperation.LEFT); // DMAR ← AR
+                dataPath.writeDmar();
+                incTick();
 
+                incIp(); // IP ← IP + 1
+                incTick();
+
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_DS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // PUSH(DS) ← TOS
+                dataPath.writeDs();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_DATA);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.oeMem();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← DMEMORY
+                dataPath.writeTos();
+                incTick();
             }
             case JMP -> {
             }
@@ -171,13 +217,15 @@ public final class ControlUnit {
             case EXIT -> {
             }
             case null -> {
-
             }
             default -> {
-
             }
         }
+        System.out.println();
+    }
 
+    private enum Stage {
+        FETCH, EXECUTE, ADDRESS
     }
 
 }

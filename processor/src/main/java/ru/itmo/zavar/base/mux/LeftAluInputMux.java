@@ -4,5 +4,6 @@ public enum LeftAluInputMux {
     FROM_RS,
     FROM_DS,
     FROM_DMAR,
-    FROM_DATA
+    FROM_DATA,
+    FROM_AR
 }
