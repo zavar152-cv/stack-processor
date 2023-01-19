@@ -39,11 +39,7 @@ public final class DataPath {
         Memory dataMemory = new Memory(memorySize, bits, data);
         tos.writeValue(0L);
         inputCharacters = new Stack<>();
-        Arrays.stream(new StringBuilder(input).reverse().toString().split(" ")).forEach(s -> {
-            if (!s.isEmpty()) {
-                inputCharacters.push(s.charAt(0));
-            }
-        });
+        new StringBuilder(input).reverse().toString().chars().forEach(s -> inputCharacters.push((char) s));
         outputBuilder = new StringBuilder();
         dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress, inputCharacters),
                 new OutputDevice(outputAddress, outputBuilder));

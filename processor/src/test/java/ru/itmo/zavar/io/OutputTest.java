@@ -19,15 +19,13 @@ public class OutputTest {
         List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, (long) 'a', (long) '5', (long) '1');
 
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
-        program.add(InstructionCode.ST.getBinary().longValue() << 24);
+        program.add((InstructionCode.ST.getBinary().longValue() << 24) + 0);
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4);
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
-        program.add(InstructionCode.ST.getBinary().longValue() << 24);
+        program.add((InstructionCode.ST.getBinary().longValue() << 24) + 0);
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 5);
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
-        program.add(InstructionCode.ST.getBinary().longValue() << 24);
-        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), "b 2 3", false);
+        program.add((InstructionCode.ST.getBinary().longValue() << 24) + 0);
+        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), "b23", false);
         controlUnit.start();
+        Assertions.assertEquals("a51", controlUnit.getTickLog().get(45).out());
     }
 }

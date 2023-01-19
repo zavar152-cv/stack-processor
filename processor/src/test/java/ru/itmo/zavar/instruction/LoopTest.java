@@ -20,14 +20,12 @@ public class LoopTest {
         program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 0
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 5); // 1
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4); // 2
-        program.add(InstructionCode.ST.getBinary().longValue() << 24); // 3
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4); // 4
-        program.add(InstructionCode.FT.getBinary().longValue() << 24); // 5
+        program.add((InstructionCode.ST.getBinary().longValue() << 24) + 5); // 2
+        program.add((InstructionCode.FT.getBinary().longValue() << 24) + 5); // 3
 
-        program.add((InstructionCode.LOOP.getBinary().longValue() << 24) + 2); // 6
-        program.add(InstructionCode.HALT.getBinary().longValue() << 24); // 7
-        program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 8
+        program.add((InstructionCode.LOOP.getBinary().longValue() << 24) + 2); // 4
+        program.add(InstructionCode.HALT.getBinary().longValue() << 24); // 5
+        program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 6
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
     }

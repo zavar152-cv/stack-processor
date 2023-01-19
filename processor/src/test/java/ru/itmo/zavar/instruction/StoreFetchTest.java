@@ -19,14 +19,12 @@ public class StoreFetchTest {
         List<Long> dataMemory = Arrays.asList(0L, 0L, 25L, 14L);
 
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
-        program.add(InstructionCode.ST.getBinary().longValue() << 24);
+        program.add((InstructionCode.ST.getBinary().longValue() << 24) + 3);
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
-        program.add(InstructionCode.FT.getBinary().longValue() << 24);
+        program.add((InstructionCode.FT.getBinary().longValue() << 24) + 3);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
-        Assertions.assertEquals(dataMemory.get(2), controlUnit.getTickLog().get(35).tos());
+        Assertions.assertEquals(dataMemory.get(2), controlUnit.getTickLog().get(22).tos());
     }
 
 }

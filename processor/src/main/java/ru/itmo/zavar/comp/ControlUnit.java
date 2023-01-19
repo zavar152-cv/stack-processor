@@ -366,17 +366,17 @@ public final class ControlUnit {
                 incTick();
             }
             case ST -> {
-                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectLalu(LeftAluInputMux.FROM_AR);
                 dataPath.selectOut(AluOutputMux.TO_DMAR);
-                dataPath.readTos();
-                dataPath.selectOp(AluOperation.RIGHT); // DMAR ← TOS
+                dataPath.readAr();
+                dataPath.selectOp(AluOperation.LEFT); // DMAR ← AR
                 dataPath.writeDmar();
                 incTick();
 
-                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
                 dataPath.selectOut(AluOutputMux.TO_DATA);
-                dataPath.readDs();
-                dataPath.selectOp(AluOperation.LEFT); // DMEMORY ← POP(DS)
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // DMEMORY ← TOS
                 dataPath.writeMem();
                 incTick();
 
@@ -387,22 +387,7 @@ public final class ControlUnit {
                 dataPath.writeTos();
                 incTick();
             }
-            case FT -> {
-                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
-                dataPath.selectOut(AluOutputMux.TO_DMAR);
-                dataPath.readTos();
-                dataPath.selectOp(AluOperation.RIGHT); // DMAR ← TOS
-                dataPath.writeDmar();
-                incTick();
-
-                dataPath.selectLalu(LeftAluInputMux.FROM_DATA);
-                dataPath.selectOut(AluOutputMux.TO_TOS);
-                dataPath.oeMem();
-                dataPath.selectOp(AluOperation.LEFT); // TOS ← DMEMORY
-                dataPath.writeTos();
-                incTick();
-            }
-            case LIT -> {
+            case FT, LIT -> {
                 dataPath.selectLalu(LeftAluInputMux.FROM_AR);
                 dataPath.selectOut(AluOutputMux.TO_DMAR);
                 dataPath.readAr();
