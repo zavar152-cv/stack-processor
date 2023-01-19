@@ -20,7 +20,7 @@ public class InputTest {
 
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 1);
         program.add((InstructionCode.JMP.getBinary().longValue() << 24) + 0);
-        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), "1 2 3", true);
+        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), "1 2 3", false);
         Assertions.assertThrows(OutOfInputException.class, controlUnit::start);
     }
 }

@@ -10,7 +10,8 @@ public record InputDevice(Integer address, Stack<Character> tokens) {
             throw new OutOfInputException("Input device with address " + address + " is out of tokens");
         }
         if (Character.isDigit(tokens.peek())) {
-            return (long) Character.digit(tokens.pop(), 10);
+            final int radix = 10;
+            return (long) Character.digit(tokens.pop(), radix);
         } else {
             return (long) tokens.pop();
         }
