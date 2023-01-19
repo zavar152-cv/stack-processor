@@ -464,7 +464,7 @@ public final class ControlUnit {
                 incTick();
             }
             case LOOP -> {
-                if(!dataPath.zeroFlag() && !dataPath.negativeFlag()) {
+                if (!dataPath.zeroFlag() && !dataPath.negativeFlag()) {
                     dataPath.selectRalu(RightAluInputMux.FROM_TOS);
                     dataPath.selectOut(AluOutputMux.TO_TOS);
                     dataPath.readTos();

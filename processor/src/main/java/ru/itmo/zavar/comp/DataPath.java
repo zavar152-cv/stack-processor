@@ -40,7 +40,7 @@ public final class DataPath {
         tos.writeValue(0L);
         inputCharacters = new Stack<>();
         Arrays.stream(new StringBuilder(input).reverse().toString().split(" ")).forEach(s -> {
-            if(!s.isEmpty()) {
+            if (!s.isEmpty()) {
                 inputCharacters.push(s.charAt(0));
             }
         });
@@ -185,7 +185,7 @@ public final class DataPath {
     }
 
     public String getOutputString() {
-        if(outputBuilder.isEmpty()) {
+        if (outputBuilder.isEmpty()) {
             return null;
         } else {
             return outputBuilder.toString();
@@ -193,7 +193,7 @@ public final class DataPath {
     }
 
     public String getInputToken() {
-        if(inputCharacters.empty()) {
+        if (inputCharacters.empty()) {
             return null;
         } else {
             return String.valueOf(inputCharacters.peek());
