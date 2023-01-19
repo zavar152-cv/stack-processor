@@ -21,7 +21,7 @@ public class JmpTest {
         program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 1
         program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 2
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2); // 3
-        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), true);
+        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
         Assertions.assertEquals(16, controlUnit.getTickLog().get(15).controlUnitTicks());
         Assertions.assertEquals(15, controlUnit.getTickLog().get(15).tos());

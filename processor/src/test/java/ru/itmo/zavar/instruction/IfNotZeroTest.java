@@ -24,7 +24,7 @@ public class IfNotZeroTest {
         program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 4
         program.add(InstructionCode.HALT.getBinary().longValue() << 24); // 5
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4); // 6
-        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), true);
+        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
         Assertions.assertNotEquals(66, controlUnit.getTickLog().get(30).tos());
         Assertions.assertEquals(InstructionCode.NOPE, controlUnit.getTickLog().get(24).instructionCode());

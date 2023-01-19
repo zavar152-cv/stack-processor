@@ -16,6 +16,9 @@ public class MemoryConstraintTest {
         Assertions.assertThrows(MemoryCellConstraintException.class, () -> {
             memory.write(100L);
         });
+        Assertions.assertThrows(MemoryCellConstraintException.class, () -> {
+            memory.write(-100L);
+        });
         Assertions.assertThrows(RegisterConstraintException.class, () -> {
             memory.writeAR(11);
         });

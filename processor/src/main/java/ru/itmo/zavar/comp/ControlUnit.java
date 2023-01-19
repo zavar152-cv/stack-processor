@@ -450,6 +450,13 @@ public final class ControlUnit {
                 dataPath.selectOp(AluOperation.RIGHT); // PUSH(RS) ← IP
                 dataPath.writeRs();
                 incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_AR);
+                dataPath.selectOut(AluOutputMux.TO_IP);
+                dataPath.readAr();
+                dataPath.selectOp(AluOperation.LEFT); // IP ← AR
+                dataPath.writeIp();
+                incTick();
             }
             case LOOP -> {
             }
