@@ -11,7 +11,7 @@ import java.util.List;
 @SuppressWarnings("MagicNumber")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 //CHECKSTYLE:OFF
-public class Main {
+public class Processor {
     public static void main(final String[] args) {
         ArrayList<Long> program = new ArrayList<>();
 

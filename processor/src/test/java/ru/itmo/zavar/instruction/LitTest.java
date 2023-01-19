@@ -1,7 +1,8 @@
-package ru.itmo.zavar;
+package ru.itmo.zavar.instruction;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.comp.ControlUnit;
 
 import java.util.ArrayList;
