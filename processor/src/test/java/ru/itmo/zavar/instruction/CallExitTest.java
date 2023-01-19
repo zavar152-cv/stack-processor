@@ -64,7 +64,7 @@ public class CallExitTest {
         program.add(InstructionCode.EXIT.getBinary().longValue() << 24); // 16
         program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 17
         program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 18
-        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), true);
+        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
         Assertions.assertEquals(24, controlUnit.getTickLog().get(23).controlUnitTicks());
         Assertions.assertEquals(8, controlUnit.getTickLog().get(23).ip());

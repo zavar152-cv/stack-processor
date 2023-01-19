@@ -13,6 +13,7 @@ import ru.itmo.zavar.io.InputDevice;
 import ru.itmo.zavar.io.OutputDevice;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 
 public final class DataPath {
@@ -28,15 +29,24 @@ public final class DataPath {
     private final Register<Integer> ar;
     private boolean negativeFlag;
     private boolean zeroFlag;
+    private final StringBuilder outputBuilder;
+    private final Stack<Character> inputCharacters;
 
     public DataPath(final ArrayList<Long> data, final Register<Integer> ipRegister, final Register<Integer> arRegister, final Integer inputAddress,
-                    final Integer outputAddress, final Integer memorySize, final Byte bits) {
+                    final Integer outputAddress, final Integer memorySize, final Byte bits, final String input) {
         ip = ipRegister;
         ar = arRegister;
         Memory dataMemory = new Memory(memorySize, bits, data);
         tos.writeValue(0L);
-        dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress),
-                new OutputDevice(outputAddress));
+        inputCharacters = new Stack<>();
+        Arrays.stream(new StringBuilder(input).reverse().toString().split(" ")).forEach(s -> {
+            if(!s.isEmpty()) {
+                inputCharacters.push(s.charAt(0));
+            }
+        });
+        outputBuilder = new StringBuilder();
+        dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress, inputCharacters),
+                new OutputDevice(outputAddress, outputBuilder));
     }
 
     public void selectOp(final AluOperation operation) {
@@ -172,6 +182,22 @@ public final class DataPath {
 
     public Long getRsValue() {
         return !returnStack.empty() ? returnStack.peek() : null;
+    }
+
+    public String getOutputString() {
+        if(outputBuilder.isEmpty()) {
+            return null;
+        } else {
+            return outputBuilder.toString();
+        }
+    }
+
+    public String getInputToken() {
+        if(inputCharacters.empty()) {
+            return null;
+        } else {
+            return String.valueOf(inputCharacters.peek());
+        }
     }
 
 }

@@ -28,7 +28,7 @@ public class LoopTest {
         program.add((InstructionCode.LOOP.getBinary().longValue() << 24) + 2); // 6
         program.add(InstructionCode.HALT.getBinary().longValue() << 24); // 7
         program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 8
-        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), true);
+        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
     }
 }

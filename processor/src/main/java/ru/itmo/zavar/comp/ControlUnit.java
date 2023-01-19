@@ -28,6 +28,10 @@ public final class ControlUnit {
     private final boolean printDebug;
 
     public ControlUnit(final ArrayList<Long> program, final ArrayList<Long> data, final boolean debug) {
+        this(program, data, "", debug);
+    }
+
+    public ControlUnit(final ArrayList<Long> program, final ArrayList<Long> data, final String input, final boolean debug) {
         final Byte dataBits = 31; // 32 bits, signed
         final Byte programBits = 32; // 32 bits, unsigned
         final Integer programMemorySize = 16777215; // [2^24 - 1; 0]
@@ -38,7 +42,7 @@ public final class ControlUnit {
         ar.writeValue(0);
         cr.writeValue(InstructionCode.NOPE.getBinary().longValue());
         resetTick();
-        dataPath = new DataPath(data, ip, ar, inputAddress, outputAddress, dataMemorySize, dataBits);
+        dataPath = new DataPath(data, ip, ar, inputAddress, outputAddress, dataMemorySize, dataBits, input);
         programMemory = new ProtectedMemory(programMemorySize, programBits, program);
         printDebug = debug;
     }
@@ -82,7 +86,8 @@ public final class ControlUnit {
         controlUnitTicks++;
         TickLog tickLog = new TickLog(controlUnitTicks, readTick(), stage, (cr.readValue() >> opcodeOffset),
                 InstructionCode.valueByBinary(Long.toBinaryString(cr.readValue() >> opcodeOffset)), ip.readValue(),
-                ar.readValue(), dataPath.getTosValue(), dataPath.getDsValue(), dataPath.getRsValue());
+                ar.readValue(), dataPath.getTosValue(), dataPath.getDsValue(), dataPath.getRsValue(),
+                dataPath.getOutputString(), dataPath.getInputToken());
         if (printDebug) {
             tickLog.print();
         }
