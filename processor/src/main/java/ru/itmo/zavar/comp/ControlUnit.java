@@ -23,8 +23,9 @@ public final class ControlUnit {
     private Stage stage;
     private final int opcodeOffset = 24;
     private final ArrayList<TickLog> tickLogs = new ArrayList<>();
+    private final boolean printDebug;
 
-    public ControlUnit(final ArrayList<Long> program, final ArrayList<Long> data) {
+    public ControlUnit(final ArrayList<Long> program, final ArrayList<Long> data, final boolean debug) {
         final Byte dataBits = 31; // 32 bits, signed
         final Byte programBits = 32; // 32 bits, unsigned
         final Integer programMemorySize = 16777215; // [2^24 - 1; 0]
@@ -37,6 +38,7 @@ public final class ControlUnit {
         resetTick();
         dataPath = new DataPath(data, ip, ar, inputAddress, outputAddress, dataMemorySize, dataBits);
         programMemory = new ProtectedMemory(programMemorySize, programBits, program);
+        printDebug = debug;
     }
 
     public void start() {
@@ -47,13 +49,17 @@ public final class ControlUnit {
             stage = Stage.FETCH;
             fetchNextInstruction();
             resetTick();
-            if (Long.toBinaryString(cr.readValue() >> opcodeOffset + 1).charAt(0) == '1') {
+            String opcode = Long.toBinaryString(cr.readValue() >> opcodeOffset);
+            if (opcode.charAt(opcode.length() - 1) == '1') {
                 stage = Stage.ADDRESS;
                 fetchAr();
                 resetTick();
             }
             stage = Stage.EXECUTE;
             execute();
+            if (printDebug) {
+                System.out.println();
+            }
         }
     }
 
@@ -74,8 +80,10 @@ public final class ControlUnit {
         controlUnitTicks++;
         TickLog tickLog = new TickLog(controlUnitTicks, readTick(), stage, (cr.readValue() >> opcodeOffset),
                 InstructionCode.valueByBinary(Long.toBinaryString(cr.readValue() >> opcodeOffset)), ip.readValue(),
-                ar.readValue(), dataPath.getTosValue());
-        tickLog.print();
+                ar.readValue(), dataPath.getTosValue(), dataPath.getDsValue(), dataPath.getRsValue());
+        if (printDebug) {
+            tickLog.print();
+        }
         tickLogs.add(tickLog);
     }
 
@@ -202,6 +210,14 @@ public final class ControlUnit {
                 dataPath.selectOut(AluOutputMux.TO_TOS);
                 dataPath.readTos();
                 dataPath.selectOp(AluOperation.RIGHT_NOT); // TOS ← not TOS
+                dataPath.writeTos();
+                incTick();
+            }
+            case BNOT -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT_BNOT); // TOS ← bnot TOS
                 dataPath.writeTos();
                 incTick();
             }
@@ -418,7 +434,6 @@ public final class ControlUnit {
             default -> {
             }
         }
-        System.out.println();
     }
 
 }

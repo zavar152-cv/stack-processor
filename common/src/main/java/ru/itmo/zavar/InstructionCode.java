@@ -10,7 +10,7 @@ public enum InstructionCode {
     ADD("0000001", "ADD"),
     SUB("0000010", "SUB"),
     MUL("0000011", "MUL"),
-    DIV("0000100", "ADD"),
+    DIV("0000100", "DIV"),
     AND("0000101", "AND"),
     OR("0000110", "OR"),
     NOT("0000111", "NOT"),
@@ -32,16 +32,15 @@ public enum InstructionCode {
     CALL("0011000", "[CALL]", true),
     LOOP("0011001", "[LOOP]", true),
     NOPE("0011010", "NOPE"),
-    EXIT("0011011", "EXIT"); //TODO reserved
+    EXIT("0011011", "EXIT"),
+    BNOT("0011100", "BNOT"); //TODO reserved
 
     private final Short binary;
     private final String mnemonic;
     private final boolean requiredArg;
 
     InstructionCode(final String binary, final String mnemonic) {
-        this.binary = Short.parseShort(binary, 2);
-        this.mnemonic = mnemonic;
-        this.requiredArg = false;
+        this(binary, mnemonic, false);
     }
 
     InstructionCode(final String binary, final String mnemonic, final boolean requiredArg) {

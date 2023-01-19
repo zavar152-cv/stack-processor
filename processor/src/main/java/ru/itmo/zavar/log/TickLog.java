@@ -3,7 +3,8 @@ package ru.itmo.zavar.log;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.comp.Stage;
 
-public record TickLog(Long controlUnitTicks, Byte tc, Stage stage, Long cr, InstructionCode instructionCode, Integer ip, Integer ar, Long tos) {
+public record TickLog(Long controlUnitTicks, Byte tc, Stage stage, Long cr, InstructionCode instructionCode, Integer ip, Integer ar, Long tos,
+                      Long ds, Long rs) {
     public void print() {
         System.out.print("Tick: " + controlUnitTicks);
         System.out.print(", TC: " + tc);
@@ -12,6 +13,8 @@ public record TickLog(Long controlUnitTicks, Byte tc, Stage stage, Long cr, Inst
                 + instructionCode + "}");
         System.out.print(", IP: " + ip);
         System.out.print(", AR: " + ar);
-        System.out.println(", TOS: " + tos);
+        System.out.print(", TOS: " + tos);
+        System.out.print(", DS: " + ds);
+        System.out.println(", RS: " + rs);
     }
 }

@@ -166,4 +166,12 @@ public final class DataPath {
         return tos.readValue();
     }
 
+    public Long getDsValue() {
+        return !dataStack.empty() ? dataStack.peek() : null;
+    }
+
+    public Long getRsValue() {
+        return !returnStack.empty() ? returnStack.peek() : null;
+    }
+
 }

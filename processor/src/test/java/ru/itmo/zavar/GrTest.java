@@ -8,24 +8,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class StoreFetchTest {
-
+public class GrTest {
     @Test
-    public void storeFetchTest() {
-        System.out.println("Testing ST and FT instructions...");
+    public void testGr() {
+        System.out.println("Testing GR instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 25L, 14L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 23L, 47L);
 
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
-        program.add(InstructionCode.ST.getBinary().longValue() << 24);
-
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
-        program.add(InstructionCode.FT.getBinary().longValue() << 24);
+        program.add(InstructionCode.GR.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
-        Assertions.assertEquals(dataMemory.get(2), controlUnit.getTickLog().get(35).tos());
-    }
+        Assertions.assertEquals(22, controlUnit.getTickLog().get(21).controlUnitTicks());
+        Assertions.assertEquals(1, controlUnit.getTickLog().get(21).tos());
 
+    }
 }

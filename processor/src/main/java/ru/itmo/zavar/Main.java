@@ -22,7 +22,7 @@ public class Main {
         program.add(InstructionCode.ADD.getBinary().longValue() << 24);
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4);
         program.add(InstructionCode.HALT.getBinary().longValue() << 24);
-        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory));
+        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), true);
         controlUnit.start();
         System.out.println("lol");
 
