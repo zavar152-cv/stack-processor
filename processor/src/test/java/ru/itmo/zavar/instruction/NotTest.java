@@ -18,7 +18,7 @@ public class NotTest {
         List<Long> dataMemory = Arrays.asList(0L, 0L, 23L);
 
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
-        program.add(InstructionCode.NOT.getBinary().longValue() << 24);
+        program.add(InstructionCode.NEG.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
         Assertions.assertEquals(15, controlUnit.getTickLog().get(14).controlUnitTicks());

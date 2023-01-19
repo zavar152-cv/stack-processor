@@ -18,5 +18,7 @@ public enum AluOperation {
     RIGHT_NOT,
     RIGHT_BNOT,
     RIGHT_INC,
-    LEFT_INC
+    RIGHT_DEC,
+    LEFT_INC,
+    LEFT_DEC
 }

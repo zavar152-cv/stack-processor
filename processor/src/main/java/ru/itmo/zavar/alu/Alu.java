@@ -33,6 +33,8 @@ public final class Alu {
             case LEFT -> output = leftInput;
             case RIGHT_INC -> output = rightInput + 1;
             case LEFT_INC -> output = leftInput + 1;
+            case RIGHT_DEC -> output = rightInput - 1;
+            case LEFT_DEC -> output = leftInput - 1;
             default -> throw new UnsupportedOperationException();
         }
     }

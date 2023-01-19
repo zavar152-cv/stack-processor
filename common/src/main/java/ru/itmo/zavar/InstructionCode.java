@@ -13,7 +13,7 @@ public enum InstructionCode {
     DIV("0000100", "DIV"),
     AND("0000101", "AND"),
     OR("0000110", "OR"),
-    NOT("0000111", "NOT"),
+    NEG("0000111", "NEG"),
     XOR("0001000", "XOR"),
     EQ("0001001", "EQ"),
     GR("0001010", "GR"),
@@ -28,7 +28,7 @@ public enum InstructionCode {
     FT("0010100", "@"),
     LIT("0010101", "[LIT]", true),
     JMP("0010110", "[JMP]", true),
-    IF("0010111", "[IF]", true), //TODO req many IF?
+    IF("0010111", "[IF]", true),
     CALL("0011000", "[CALL]", true),
     LOOP("0011001", "[LOOP]", true),
     NOPE("0011010", "NOPE"),
