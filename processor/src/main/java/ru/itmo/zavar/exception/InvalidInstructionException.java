@@ -1,7 +1,7 @@
 package ru.itmo.zavar.exception;
 
 public class InvalidInstructionException extends RuntimeException {
-    public InvalidInstructionException(String message) {
+    public InvalidInstructionException(final String message) {
         super(message);
     }
 }
