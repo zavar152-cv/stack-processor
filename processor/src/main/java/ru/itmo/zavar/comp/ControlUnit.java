@@ -7,6 +7,8 @@ import ru.itmo.zavar.base.mux.AluOutputMux;
 import ru.itmo.zavar.base.mux.LeftAluInputMux;
 import ru.itmo.zavar.base.mux.RightAluInputMux;
 import ru.itmo.zavar.base.register.Register;
+import ru.itmo.zavar.exception.InvalidInstructionException;
+import ru.itmo.zavar.exception.ReservedInstructionException;
 import ru.itmo.zavar.log.TickLog;
 
 import java.util.ArrayList;
@@ -418,21 +420,50 @@ public final class ControlUnit {
                 incTick();
             }
             case JMP -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_AR);
+                dataPath.selectOut(AluOutputMux.TO_IP);
+                dataPath.readAr();
+                dataPath.selectOp(AluOperation.LEFT); // IP ← AR
+                dataPath.writeIp();
+                incTick();
             }
             case IF -> {
+                if (dataPath.zeroFlag()) {
+                    dataPath.selectLalu(LeftAluInputMux.FROM_AR);
+                    dataPath.selectOut(AluOutputMux.TO_IP);
+                    dataPath.readAr();
+                    dataPath.selectOp(AluOperation.LEFT); // IP ← AR
+                    dataPath.writeIp();
+                    incTick();
+                }
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← POP(DS)
+                dataPath.writeTos();
+                incTick();
             }
             case CALL -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_IP);
+                dataPath.selectOut(AluOutputMux.TO_RS);
+                dataPath.readIp();
+                dataPath.selectOp(AluOperation.RIGHT); // PUSH(RS) ← IP
+                dataPath.writeRs();
+                incTick();
             }
             case LOOP -> {
             }
-            case NOPE -> {
-            }
+            case NOPE -> incTick();
             case EXIT -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_RS);
+                dataPath.selectOut(AluOutputMux.TO_IP);
+                dataPath.readRs();
+                dataPath.selectOp(AluOperation.LEFT); // IP ← POP(RS)
+                dataPath.writeIp();
+                incTick();
             }
-            case null -> {
-            }
-            default -> {
-            }
+            case null -> throw new InvalidInstructionException("Instruction is null");
+            default -> throw new ReservedInstructionException();
         }
     }
 
