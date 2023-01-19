@@ -13,7 +13,6 @@ import ru.itmo.zavar.io.InputDevice;
 import ru.itmo.zavar.io.OutputDevice;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Stack;
 
 public final class DataPath {
