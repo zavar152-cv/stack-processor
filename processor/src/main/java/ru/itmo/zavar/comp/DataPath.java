@@ -8,7 +8,9 @@ import ru.itmo.zavar.base.mux.AluOutputMux;
 import ru.itmo.zavar.base.mux.LeftAluInputMux;
 import ru.itmo.zavar.base.mux.RightAluInputMux;
 import ru.itmo.zavar.base.register.Register;
+import ru.itmo.zavar.exception.DsEmpty;
 import ru.itmo.zavar.exception.InvalidMuxSelectionException;
+import ru.itmo.zavar.exception.RsEmpty;
 import ru.itmo.zavar.io.InputDevice;
 import ru.itmo.zavar.io.OutputDevice;
 
@@ -143,16 +145,22 @@ public final class DataPath {
         }
     }
 
-    public void readDs() throws InvalidMuxSelectionException {
+    public void readDs() throws InvalidMuxSelectionException, DsEmpty {
         if (leftAluInputMux == LeftAluInputMux.FROM_DS) {
+            if (dataStack.empty()) {
+                throw new DsEmpty();
+            }
             alu.setLeftInput(dataStack.pop());
         } else {
             throw new InvalidMuxSelectionException("Select FROM_DS to read from DS");
         }
     }
 
-    public void readRs() throws InvalidMuxSelectionException {
+    public void readRs() throws InvalidMuxSelectionException, RsEmpty {
         if (leftAluInputMux == LeftAluInputMux.FROM_RS) {
+            if (returnStack.empty()) {
+                throw new RsEmpty();
+            }
             alu.setLeftInput(returnStack.pop());
         } else {
             throw new InvalidMuxSelectionException("Select FROM_RS to read from RS");

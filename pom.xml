@@ -92,6 +92,9 @@
                     <excludes>
                         <exclude>ru/itmo/zavar/exception/InvalidMuxSelectionException.class</exclude>
                         <exclude>ru/itmo/zavar/exception/ReservedInstructionException.class</exclude>
+                        <exclude>ru/itmo/zavar/exception/ControlUnitException.class</exclude>
+                        <exclude>ru/itmo/zavar/exception/RsEmpty.class</exclude>
+                        <exclude>ru/itmo/zavar/exception/DsEmpty.class</exclude>
                         <exclude>ru/itmo/zavar/Processor.class</exclude>
                         <exclude>ru/itmo/zavar/log/TickLog.class</exclude>
                     </excludes>

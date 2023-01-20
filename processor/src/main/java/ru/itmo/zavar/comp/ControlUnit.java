@@ -7,6 +7,7 @@ import ru.itmo.zavar.base.mux.AluOutputMux;
 import ru.itmo.zavar.base.mux.LeftAluInputMux;
 import ru.itmo.zavar.base.mux.RightAluInputMux;
 import ru.itmo.zavar.base.register.Register;
+import ru.itmo.zavar.exception.ControlUnitException;
 import ru.itmo.zavar.exception.InvalidInstructionException;
 import ru.itmo.zavar.exception.ReservedInstructionException;
 import ru.itmo.zavar.log.TickLog;
@@ -35,7 +36,7 @@ public final class ControlUnit {
         final Byte dataBits = 31; // 32 bits, signed
         final Byte programBits = 32; // 32 bits, unsigned
         final Integer programMemorySize = 16777215; // [2^24 - 1; 0]
-        final Integer dataMemorySize = 2048;
+        final Integer dataMemorySize = 4096;
         final Integer inputAddress = 1;
         final Integer byteAddress = 0;
         final Integer charAddress = 2;
@@ -48,7 +49,7 @@ public final class ControlUnit {
         printDebug = debug;
     }
 
-    public void start() {
+    public void start() throws ControlUnitException {
         stopped = false;
         controlUnitTicks = 0L;
         while (!stopped) {
