@@ -16,7 +16,7 @@ public class InputTest {
         System.out.println("Testing INPUT...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 1L, 2L, 5L, 3L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 1L, 2L, 5L, 3L);
 
         program.add((InstructionCode.ADDR.getBinary().longValue() << 24) + 1);
         program.add(InstructionCode.FT.getBinary().longValue() << 24);

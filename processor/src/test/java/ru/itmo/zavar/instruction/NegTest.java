@@ -9,15 +9,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class NotTest {
+public class NegTest {
     @Test
     public void testNot() {
         System.out.println("Testing NOT instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 23L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 23L);
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
         program.add(InstructionCode.NEG.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();

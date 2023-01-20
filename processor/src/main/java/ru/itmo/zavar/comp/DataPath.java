@@ -32,7 +32,7 @@ public final class DataPath {
     private final Stack<Character> inputCharacters;
 
     public DataPath(final ArrayList<Long> data, final Register<Integer> ipRegister, final Register<Integer> arRegister, final Integer inputAddress,
-                    final Integer outputAddress, final Integer memorySize, final Byte bits, final String input) {
+                    final Integer byteAddress, final Integer charAddress, final Integer memorySize, final Byte bits, final String input) {
         ip = ipRegister;
         ar = arRegister;
         Memory dataMemory = new Memory(memorySize, bits, data);
@@ -41,7 +41,7 @@ public final class DataPath {
         new StringBuilder(input).reverse().toString().chars().forEach(s -> inputCharacters.push((char) s));
         outputBuilder = new StringBuilder();
         dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress, inputCharacters),
-                new OutputDevice(outputAddress, outputBuilder));
+                new OutputDevice(byteAddress, charAddress, outputBuilder));
     }
 
     public void selectOp(final AluOperation operation) {
@@ -81,7 +81,7 @@ public final class DataPath {
         if (aluOutputMux == AluOutputMux.TO_DMAR) {
             dataMemoryController.writeAddress(Math.toIntExact(alu.getOutput()));
         } else {
-            throw new InvalidMuxSelectionException("Select TO_DMAR to write in address registry");
+            throw new InvalidMuxSelectionException("Select TO_DMAR to write in charAddress registry");
         }
     }
 

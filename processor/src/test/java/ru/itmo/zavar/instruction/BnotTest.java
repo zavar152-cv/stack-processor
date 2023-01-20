@@ -15,9 +15,9 @@ public class BnotTest {
         System.out.println("Testing BNOT instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 23L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 23L);
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
         program.add(InstructionCode.BNOT.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();

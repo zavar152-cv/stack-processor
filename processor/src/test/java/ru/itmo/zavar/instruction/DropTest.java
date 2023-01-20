@@ -15,10 +15,10 @@ public class DropTest {
         System.out.println("Testing DROP instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 23L, 47L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 23L, 47L);
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4);
         program.add(InstructionCode.DROP.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();

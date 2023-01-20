@@ -16,10 +16,10 @@ public class SubTest {
         System.out.println("Testing SUB instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 34L, 10L, 66L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 34L, 10L, 66L);
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4);
         program.add(InstructionCode.SUB.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();

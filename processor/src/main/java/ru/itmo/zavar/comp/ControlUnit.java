@@ -37,12 +37,13 @@ public final class ControlUnit {
         final Integer programMemorySize = 16777215; // [2^24 - 1; 0]
         final Integer dataMemorySize = 2048;
         final Integer inputAddress = 1;
-        final Integer outputAddress = 0;
+        final Integer byteAddress = 0;
+        final Integer charAddress = 2;
         ip.writeValue(0);
         ar.writeValue(0);
         cr.writeValue(InstructionCode.NOPE.getBinary().longValue());
         resetTick();
-        dataPath = new DataPath(data, ip, ar, inputAddress, outputAddress, dataMemorySize, dataBits, input);
+        dataPath = new DataPath(data, ip, ar, inputAddress, byteAddress, charAddress, dataMemorySize, dataBits, input);
         programMemory = new ProtectedMemory(programMemorySize, programBits, program);
         printDebug = debug;
     }

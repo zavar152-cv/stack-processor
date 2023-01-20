@@ -15,10 +15,10 @@ public class AddrTest {
         System.out.println("Testing ADDR instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 1L, 2L, 5L, 3L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 1L, 2L, 5L, 3L);
 
         program.add((InstructionCode.ADDR.getBinary().longValue() << 24) + 5); // 0
-        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), true);
+        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
         Assertions.assertEquals(6, controlUnit.getTickLog().get(5).controlUnitTicks());
         Assertions.assertEquals(controlUnit.getTickLog().get(5).ar().longValue(), controlUnit.getTickLog().get(5).tos());

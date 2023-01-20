@@ -11,8 +11,10 @@ public final class DataMemoryController {
     private final OutputDevice outputDevice;
 
     public void write(final Long value) {
-        if (memory.readAR().equals(outputDevice.address())) {
-            outputDevice.write(value);
+        if (memory.readAR().equals(outputDevice.charAddress())) {
+            outputDevice.writeChar(value);
+        } else if (memory.readAR().equals(outputDevice.byteAddress())) {
+            outputDevice.writeByte(value);
         } else {
             memory.write(value);
         }

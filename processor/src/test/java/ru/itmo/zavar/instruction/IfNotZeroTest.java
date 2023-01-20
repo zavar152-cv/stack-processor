@@ -15,15 +15,15 @@ public class IfNotZeroTest {
         System.out.println("Testing IF instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 15L, 15L, 66L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 15L, 15L, 66L);
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2); // 0
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3); // 1
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3); // 0
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4); // 1
         program.add(InstructionCode.EQ.getBinary().longValue() << 24); // 2
         program.add((InstructionCode.IF.getBinary().longValue() << 24) + 6); // 3
         program.add(InstructionCode.NOPE.getBinary().longValue() << 24); // 4
         program.add(InstructionCode.HALT.getBinary().longValue() << 24); // 5
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4); // 6
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 5); // 6
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
         Assertions.assertNotEquals(66, controlUnit.getTickLog().get(30).tos());

@@ -16,10 +16,10 @@ public class AddTest {
         System.out.println("Testing ADD instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 13L, 2L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 13L, 2L);
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4);
         program.add(InstructionCode.ADD.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();

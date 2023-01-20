@@ -15,10 +15,10 @@ public class XorTest {
         System.out.println("Testing XOR instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 56L, 25L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 56L, 25L);
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4);
         program.add(InstructionCode.XOR.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();

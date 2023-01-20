@@ -16,10 +16,10 @@ public class MulTest {
         System.out.println("Testing MUL instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, -4L, 10L, 66L);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, -4L, 10L, 66L);
 
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 2);
         program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 3);
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4);
         program.add(InstructionCode.MUL.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();

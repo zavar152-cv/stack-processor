@@ -15,8 +15,8 @@ public class LitTest {
         System.out.println("Testing LIT instruction...");
         ArrayList<Long> program = new ArrayList<>();
 
-        List<Long> dataMemory = Arrays.asList(0L, 0L, 13L, 2L, 66L);
-        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 4);
+        List<Long> dataMemory = Arrays.asList(0L, 0L, 0L, 13L, 2L, 66L);
+        program.add((InstructionCode.LIT.getBinary().longValue() << 24) + 5);
         program.add(InstructionCode.HALT.getBinary().longValue() << 24);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
