@@ -69,7 +69,6 @@ public class ZorthCompiler {
             isFunction = false;
             parseWords(listIterator);
         }
-//        System.out.println("END base");
     }
 
     // TODO errors
@@ -79,20 +78,23 @@ public class ZorthCompiler {
             listIterator.next(); //skip :
             String name = listIterator.next();
             if (!name.matches("([A-Z]|[a-z]|[0-9])+")) {
-                throw new IllegalArgumentException("Check your function name at " + listIterator.previousIndex());
+                throw new IllegalArgumentException("Invalid function name at " + (listIterator.previousIndex() + 1));
             }
             ArrayList<String> funcTokens = new ArrayList<>();
             String t = listIterator.next();
-            while (!t.equals(";")) {
-                funcTokens.add(t);
-                t = listIterator.next();
+            try {
+                while (!t.equals(";")) {
+                    funcTokens.add(t);
+                    t = listIterator.next();
+                }
+            } catch (NoSuchElementException e) {
+                throw new NoSuchElementException("Missing \";\" at " + (listIterator.previousIndex() + 1));
             }
             parseWords(funcTokens.listIterator());
             functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.EXIT, ""));
             functionAddressTable.put(new AbstractMap.SimpleEntry<>(name, currentFunctionLength), 0);
-        } catch (NoSuchElementException e) {
-            e.printStackTrace();
-            System.err.println("Check your function syntax at " + listIterator.previousIndex() + " " + e.getMessage());
+        } catch (Exception e) {
+            throw new IllegalArgumentException((e.getMessage() != null ? e.getMessage() : ""));
         }
     }
 
@@ -154,8 +156,11 @@ public class ZorthCompiler {
         } else {
             if (word.equals("variable")) {
                 word = listIterator.next();
+                String finalWord = word;
                 if (variableAddressTable.containsKey(word)) {
-                    throw new IllegalArgumentException("Variable \"" + word + "\" is already exists");
+                    throw new IllegalArgumentException("Variable \"" + word + "\" is already exists, at " + (listIterator.previousIndex() + 1));
+                } else if(functionAddressTable.keySet().stream().anyMatch(s -> s.getKey().equals(finalWord))) {
+                    throw new IllegalArgumentException("Variable can't be created. Function \"" + word + "\" is already exists, at " + (listIterator.previousIndex() + 1));
                 } else {
                     variableAddressTable.put(word, 0);
                 }
@@ -170,14 +175,14 @@ public class ZorthCompiler {
                     if (functionAddressTable.keySet().stream().anyMatch(s -> s.getKey().equals(finalWord))) {
                         temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.CALL, "fun$" + word));
                     } else {
-                        throw new IllegalArgumentException("Invalid var or func name: " + word);
+                        throw new IllegalArgumentException("Invalid var or func name: \"" + word + "\" at " + (listIterator.previousIndex() + 1));
                     }
                 }
             } else if (word.equals(".\"")) {
                 //TODO string
                 System.out.println("TODO");
             } else {
-                throw new IllegalArgumentException("Unknown word: " + word);
+                throw new IllegalArgumentException("Unknown word: \"" + word + "\" at " + (listIterator.previousIndex() + 1));
             }
         }
 
@@ -195,5 +200,22 @@ public class ZorthCompiler {
 
     private void parseLoop(final ListIterator<String> listIterator) {
         listIterator.next(); // skip "do"
+        ArrayList<String> loopTokens = new ArrayList<>();
+        String t = listIterator.next();
+        try {
+            while (!t.equals("loop")) {
+                loopTokens.add(t);
+                t = listIterator.next();
+            }
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException("Missing \"loop\" at " + (listIterator.previousIndex() + 1));
+        }
+        parseWords(loopTokens.listIterator());
+        if (isFunction) {
+            currentFunctionLength++;
+            functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.LOOP, "loop$" + loopTokens.size()));
+        } else {
+            mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.LOOP, "loop$" + loopTokens.size()));
+        }
     }
 }
