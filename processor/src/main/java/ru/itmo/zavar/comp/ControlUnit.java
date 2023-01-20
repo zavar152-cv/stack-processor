@@ -222,7 +222,7 @@ public final class ControlUnit {
                 dataPath.writeTos();
                 incTick();
             }
-            case BNOT -> {
+            case NOT -> {
                 dataPath.selectRalu(RightAluInputMux.FROM_TOS);
                 dataPath.selectOut(AluOutputMux.TO_TOS);
                 dataPath.readTos();

@@ -33,7 +33,7 @@ public enum InstructionCode {
     LOOP("0011001", "[LOOP]", true),
     NOPE("0011010", "NOPE"),
     EXIT("0011011", "EXIT"),
-    BNOT("0011100", "BNOT"),
+    NOT("0011100", "NOT"),
     ADDR("0011101", "[ADDR]", true); //TODO reserved
 
     private final Short binary;
