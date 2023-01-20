@@ -18,7 +18,8 @@ public class InputTest {
 
         List<Long> dataMemory = Arrays.asList(0L, 0L, 1L, 2L, 5L, 3L);
 
-        program.add((InstructionCode.FT.getBinary().longValue() << 24) + 1);
+        program.add((InstructionCode.ADDR.getBinary().longValue() << 24) + 1);
+        program.add(InstructionCode.FT.getBinary().longValue() << 24);
         program.add((InstructionCode.JMP.getBinary().longValue() << 24) + 0);
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), "a2 3", false);
         Assertions.assertThrows(OutOfInputException.class, controlUnit::start);
