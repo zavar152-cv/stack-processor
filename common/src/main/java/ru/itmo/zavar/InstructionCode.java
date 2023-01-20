@@ -24,8 +24,8 @@ public enum InstructionCode {
     SWAP("0010000", "SWAP"),
     MR("0010001", ">R"),
     RM("0010010", "R>"),
-    ST("0010011", "!", true),
-    FT("0010100", "@", true),
+    ST("0010011", "!"),
+    FT("0010100", "@"),
     LIT("0010101", "[LIT]", true),
     JMP("0010110", "[JMP]", true),
     IF("0010111", "[IF]", true),
@@ -33,7 +33,8 @@ public enum InstructionCode {
     LOOP("0011001", "[LOOP]", true),
     NOPE("0011010", "NOPE"),
     EXIT("0011011", "EXIT"),
-    BNOT("0011100", "BNOT"); //TODO reserved
+    BNOT("0011100", "BNOT"),
+    ADDR("0011101", "[ADDR]", true); //TODO reserved
 
     private final Short binary;
     private final String mnemonic;

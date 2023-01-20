@@ -366,17 +366,17 @@ public final class ControlUnit {
                 incTick();
             }
             case ST -> {
-                dataPath.selectLalu(LeftAluInputMux.FROM_AR);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
                 dataPath.selectOut(AluOutputMux.TO_DMAR);
-                dataPath.readAr();
-                dataPath.selectOp(AluOperation.LEFT); // DMAR ← AR
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // DMAR ← TOS
                 dataPath.writeDmar();
                 incTick();
 
-                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
                 dataPath.selectOut(AluOutputMux.TO_DATA);
-                dataPath.readTos();
-                dataPath.selectOp(AluOperation.RIGHT); // DMEMORY ← TOS
+                dataPath.readDs();
+                dataPath.selectOp(AluOperation.LEFT); // DMEMORY ← POP(DS)
                 dataPath.writeMem();
                 incTick();
 
@@ -387,7 +387,22 @@ public final class ControlUnit {
                 dataPath.writeTos();
                 incTick();
             }
-            case FT, LIT -> {
+            case FT -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_DMAR);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // DMAR ← TOS
+                dataPath.writeDmar();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_DATA);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.oeMem();
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← DMEMORY
+                dataPath.writeTos();
+                incTick();
+            }
+            case LIT -> {
                 dataPath.selectLalu(LeftAluInputMux.FROM_AR);
                 dataPath.selectOut(AluOutputMux.TO_DMAR);
                 dataPath.readAr();
@@ -406,6 +421,21 @@ public final class ControlUnit {
                 dataPath.selectOut(AluOutputMux.TO_TOS);
                 dataPath.oeMem();
                 dataPath.selectOp(AluOperation.LEFT); // TOS ← DMEMORY
+                dataPath.writeTos();
+                incTick();
+            }
+            case ADDR -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_DS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT); // PUSH(DS) ← TOS
+                dataPath.writeDs();
+                incTick();
+
+                dataPath.selectLalu(LeftAluInputMux.FROM_AR);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readAr();
+                dataPath.selectOp(AluOperation.LEFT); // IP ← AR
                 dataPath.writeTos();
                 incTick();
             }
