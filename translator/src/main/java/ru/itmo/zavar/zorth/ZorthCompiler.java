@@ -184,8 +184,23 @@ public class ZorthCompiler {
                     }
                 }
             } else if (word.equals(".\"")) {
-                //TODO string
-                System.out.println("TODO");
+                StringBuilder str = new StringBuilder();
+                word = listIterator.next();
+                str.append(word);
+                try {
+                    while (!word.endsWith("\"")) {
+                        word = listIterator.next();
+                        str.append(word);
+                    }
+                } catch (NoSuchElementException e) {
+                    throw new IllegalArgumentException("Invalid string format");
+                }
+                str.chars().forEach(value -> {
+                    literalAddressTable.put((long) value, 0);
+                    temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.LIT, "lit$" + (long) value));
+                    temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.ADDR, "2"));
+                    temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.ST, ""));
+                });
             } else {
                 throw new IllegalArgumentException("Unknown word: \"" + word + "\" at " + (listIterator.previousIndex() + 1));
             }

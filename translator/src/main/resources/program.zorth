@@ -8,8 +8,14 @@
 variable data
 buzz
 data @
+2 data ! / NOT < >
+DROP DUP OVER
+.
+IN
+SWAP
 bizz
 do 9 8 do 97 EMIT data loop + loop
 AND
 variable foo
 if 4 1 AND if OR * endif = endif - + 9
+." Hello world!"
