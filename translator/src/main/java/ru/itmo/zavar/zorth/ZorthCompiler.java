@@ -28,18 +28,21 @@ public class ZorthCompiler {
         try (BufferedReader bufferedReader = Files.newBufferedReader(inputFilePath)) {
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
-                tokens.addAll(Arrays.stream(line.split(" ")).toList());
+                line = line.replaceAll("//+.*", "");
+                if (!line.isEmpty()) {
+                    tokens.addAll(Arrays.stream(line.split(" ")).toList());
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        //tokens.forEach(System.out::println);
         ListIterator<String> stringListIterator = tokens.listIterator();
         parseBase(stringListIterator);
         mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.HALT, ""));
 
-        System.out.println("Parsed:");
+        System.out.println("Parsed main:");
         mainProgram.forEach(ins -> System.out.println(ins.getKey() + " " + ins.getValue()));
+        System.out.println("Parsed functions:");
         functionsProgram.forEach(ins -> System.out.println(ins.getKey() + " " + ins.getValue()));
         System.out.println("\nFunction table:");
         functionAddressTable.forEach((e, integer) -> {
@@ -198,7 +201,36 @@ public class ZorthCompiler {
 
     private int parseIf(final ListIterator<String> listIterator) {
         listIterator.next(); // skip "if"
-        return 0;
+        ArrayList<String> ifTokens = new ArrayList<>();
+        String t = listIterator.next();
+        long ifCount = 1;
+        long endifCount = 0;
+        try {
+            while (ifCount != endifCount) {
+                ifTokens.add(t);
+                t = listIterator.next();
+                if (t.equals("if")) {
+                    ifCount++;
+                }
+                if (t.equals("endif")) {
+                    endifCount++;
+                }
+            }
+        } catch (NoSuchElementException e) { //TODO add error
+            throw new NoSuchElementException("Missing \"endif\" at " + (listIterator.previousIndex() + 1)); //TODO fix position
+        }
+        if (isFunction) {
+            functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.IF, "if$"));
+        } else {
+            mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.IF, "if$"));
+        }
+        int count = parseWords(ifTokens.listIterator());
+        if (isFunction) {
+            functionsProgram.set(functionsProgram.size() - count - 1, new AbstractMap.SimpleEntry<>(InstructionCode.IF, "if$" + (count + 1)));
+        } else {
+            mainProgram.set(mainProgram.size() - count - 1, new AbstractMap.SimpleEntry<>(InstructionCode.IF, "if$" + (count + 1)));
+        }
+        return count + 1;
     }
 
     private int parseLoop(final ListIterator<String> listIterator) {
@@ -218,7 +250,7 @@ public class ZorthCompiler {
                     doCount++;
                 }
             }
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) { //TODO add error
             throw new NoSuchElementException("Missing \"loop\" at " + (listIterator.previousIndex() + 1)); //TODO fix position
         }
         int count = parseWords(loopTokens.listIterator());
