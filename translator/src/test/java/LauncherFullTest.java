@@ -12,7 +12,8 @@ public class LauncherFullTest {
         URL resource = getClass().getClassLoader().getResource("program.zorth");
         assert resource != null;
         Path path = Paths.get(resource.toURI());
-        String[] args = {"-i", path.toString(), "-o", "output.bin", "-f", "bin"};
+        Path home = Path.of(System.getProperty("user.home"));
+        String[] args = {"-i", path.toString(), "-o", String.valueOf(home), "-f", "mne"};
         Launcher.main(args);
     }
 }

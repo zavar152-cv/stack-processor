@@ -9,8 +9,10 @@ import ru.itmo.zavar.exception.UnknownWordException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -139,6 +141,66 @@ public class ZorthCompiler {
                 System.out.println(string + ", address:" + integer);
             });
             program.forEach(ins -> System.out.println(ins.getKey().getMnemonic() + " " + ins.getValue()));
+        }
+    }
+
+    public void saveProgramAndData() throws IOException {
+        if(isBinary) {
+            Path programPath = outputFilePath.resolve("compiled.bin");
+            Files.createFile(programPath);
+            program.forEach(entry -> {
+                byte[] bytes;
+                if(!entry.getValue().isEmpty()) {
+                    bytes = InstructionCode.longToBytes((entry.getKey().getBinary().longValue() << 24) + Integer.parseInt(entry.getValue()));
+                } else {
+                    bytes = InstructionCode.longToBytes((entry.getKey().getBinary().longValue() << 24));
+                }
+                try {
+                    Files.write(programPath, bytes, StandardOpenOption.APPEND);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            Path dataPath = outputFilePath.resolve("data.dbin");
+            Files.createFile(dataPath);
+            data.forEach(aLong -> {
+                byte[] bytes = InstructionCode.longToBytes(aLong);
+                try {
+                    Files.write(dataPath, bytes, StandardOpenOption.APPEND);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } else {
+            Path programPath = outputFilePath.resolve("compiled.z");
+            Files.createFile(programPath);
+            program.forEach(entry -> {
+                String ins = "";
+                if(!entry.getValue().isEmpty()) {
+                    ins = entry.getKey().getMnemonic() + " " + entry.getValue();
+                } else {
+                    ins = entry.getKey().getMnemonic();
+                }
+                try {
+                    Files.writeString(programPath, ins, StandardOpenOption.APPEND);
+                    Files.writeString(programPath, "\n", StandardOpenOption.APPEND);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            Path dataPath = outputFilePath.resolve("data.dz");
+            Files.createFile(dataPath);
+            data.forEach(aLong -> {
+                String data = String.valueOf(aLong);
+                try {
+                    Files.writeString(dataPath, data, StandardOpenOption.APPEND);
+                    Files.writeString(dataPath, "\n", StandardOpenOption.APPEND);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
     }
 

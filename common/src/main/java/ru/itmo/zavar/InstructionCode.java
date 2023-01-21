@@ -2,6 +2,7 @@ package ru.itmo.zavar;
 
 import lombok.Getter;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 @Getter
@@ -59,5 +60,23 @@ public enum InstructionCode {
     public static InstructionCode valueByBinary(final String binary) {
         return Arrays.stream(values()).filter(instructionCode -> Integer.toBinaryString(instructionCode.binary)
                 .equals(binary)).findFirst().orElse(null);
+    }
+
+    public static InstructionCode valueByMnemonic(final String mnemonic) {
+        return Arrays.stream(values()).filter(instructionCode -> instructionCode.mnemonic
+                .equals(mnemonic)).findFirst().orElse(null);
+    }
+
+    public static byte[] longToBytes(final long x) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(x);
+        return buffer.array();
+    }
+
+    public static long bytesToLong(final byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.put(bytes);
+        buffer.flip();
+        return buffer.getLong();
     }
 }

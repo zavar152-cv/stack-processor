@@ -17,7 +17,7 @@ public final class Launcher {
         input.setType(Path.class);
         options.addOption(input);
 
-        Option output = new Option("o", "output", true, "output file path");
+        Option output = new Option("o", "output", true, "output path");
         output.setRequired(true);
         output.setType(Path.class);
         options.addOption(output);
@@ -46,6 +46,7 @@ public final class Launcher {
         try {
             zorthCompiler.compile(true);
             zorthCompiler.linkage(true);
+            zorthCompiler.saveProgramAndData();
         } catch (Exception e) {
             System.err.println(e.getMessage());
             System.exit(1);
