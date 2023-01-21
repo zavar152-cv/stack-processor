@@ -12,6 +12,7 @@
         <module>processor</module>
         <module>translator</module>
         <module>common</module>
+        <module>report</module>
     </modules>
 
     <properties>
