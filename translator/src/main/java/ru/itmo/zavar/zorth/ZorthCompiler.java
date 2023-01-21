@@ -2,6 +2,10 @@ package ru.itmo.zavar.zorth;
 
 import lombok.RequiredArgsConstructor;
 import ru.itmo.zavar.InstructionCode;
+import ru.itmo.zavar.exception.InvalidFunctionNameException;
+import ru.itmo.zavar.exception.InvalidStringException;
+import ru.itmo.zavar.exception.InvalidVariableNameException;
+import ru.itmo.zavar.exception.UnknownWordException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,7 +27,7 @@ public class ZorthCompiler {
     private final ArrayList<Long> data = new ArrayList<>();
     private boolean isFunction = false;
 
-    public void compile() {
+    public void compile(final boolean debug) {
         ArrayList<String> tokens = new ArrayList<>();
         try (BufferedReader bufferedReader = Files.newBufferedReader(inputFilePath)) {
             while (bufferedReader.ready()) {
@@ -36,26 +40,31 @@ public class ZorthCompiler {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        if (tokens.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
         ListIterator<String> stringListIterator = tokens.listIterator();
         parseBase(stringListIterator);
         mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.HALT, ""));
 
-        System.out.println("Parsed main:");
-        mainProgram.forEach(ins -> System.out.println(ins.getKey() + " " + ins.getValue()));
-        System.out.println("Parsed functions:");
-        functionsProgram.forEach(ins -> System.out.println(ins.getKey() + " " + ins.getValue()));
-        System.out.println("\nFunction table:");
-        functionAddressTable.forEach((e, integer) -> {
-            System.out.println(e.getKey() + ", size:" + e.getValue() + ", address:" + integer);
-        });
-        System.out.println("\nLiteral table:");
-        literalAddressTable.forEach((aLong, integer) -> {
-            System.out.println(aLong + ", address:" + integer);
-        });
-        System.out.println("\nVar table:");
-        variableAddressTable.forEach((string, integer) -> {
-            System.out.println(string + ", address:" + integer);
-        });
+        if (debug) {
+            System.out.println("Parsed main:");
+            mainProgram.forEach(ins -> System.out.println(ins.getKey() + " " + ins.getValue()));
+            System.out.println("Parsed functions:");
+            functionsProgram.forEach(ins -> System.out.println(ins.getKey() + " " + ins.getValue()));
+            System.out.println("\nFunction table:");
+            functionAddressTable.forEach((e, integer) -> {
+                System.out.println(e.getKey() + ", size:" + e.getValue() + ", address:" + integer);
+            });
+            System.out.println("\nLiteral table:");
+            literalAddressTable.forEach((aLong, integer) -> {
+                System.out.println(aLong + ", address:" + integer);
+            });
+            System.out.println("\nVar table:");
+            variableAddressTable.forEach((string, integer) -> {
+                System.out.println(string + ", address:" + integer);
+            });
+        }
     }
 
     private void parseBase(final ListIterator<String> listIterator) {
@@ -79,7 +88,7 @@ public class ZorthCompiler {
             listIterator.next(); //skip :
             String name = listIterator.next();
             if (!name.matches("([A-Z]|[a-z]|[0-9])+")) {
-                throw new IllegalArgumentException("Invalid function name at " + (listIterator.previousIndex() + 1));
+                throw new InvalidFunctionNameException("Invalid function name at " + (listIterator.previousIndex() + 1));
             }
             ArrayList<String> funcTokens = new ArrayList<>();
             String t = listIterator.next();
@@ -162,9 +171,9 @@ public class ZorthCompiler {
                 word = listIterator.next();
                 String finalWord = word;
                 if (variableAddressTable.containsKey(word)) {
-                    throw new IllegalArgumentException("Variable \"" + word + "\" is already exists, at " + (listIterator.previousIndex() + 1));
+                    throw new InvalidVariableNameException("Variable \"" + word + "\" is already exists, at " + (listIterator.previousIndex() + 1));
                 } else if (functionAddressTable.keySet().stream().anyMatch(s -> s.getKey().equals(finalWord))) {
-                    throw new IllegalArgumentException("Variable can't be created. Function \"" + word + "\" is already exists, "
+                    throw new InvalidVariableNameException("Variable can't be created. Function \"" + word + "\" is already exists, "
                             + "at " + (listIterator.previousIndex() + 1));
                 } else {
                     variableAddressTable.put(word, 0);
@@ -193,7 +202,7 @@ public class ZorthCompiler {
                         str.append(word);
                     }
                 } catch (NoSuchElementException e) {
-                    throw new IllegalArgumentException("Invalid string format");
+                    throw new InvalidStringException("Invalid string format at " + (listIterator.previousIndex() + 1));
                 }
                 str.chars().forEach(value -> {
                     literalAddressTable.put((long) value, 0);
@@ -202,7 +211,7 @@ public class ZorthCompiler {
                     temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.ST, ""));
                 });
             } else {
-                throw new IllegalArgumentException("Unknown word: \"" + word + "\" at " + (listIterator.previousIndex() + 1));
+                throw new UnknownWordException("Unknown word: \"" + word + "\" at " + (listIterator.previousIndex() + 1));
             }
         }
 

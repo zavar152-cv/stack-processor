@@ -33,7 +33,7 @@ public final class Launcher {
         try {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             formatter.printHelp("translator.jar", options);
             System.exit(1);
         }
@@ -42,11 +42,12 @@ public final class Launcher {
         String outputFilePath = cmd.getOptionValue("output");
         String outputFormat = cmd.getOptionValue("format");
 
-//        System.out.println(inputFilePath);
-//        System.out.println(outputFilePath);
-//        System.out.println(outputFormat);
-
         ZorthCompiler zorthCompiler = new ZorthCompiler(Path.of(inputFilePath), Path.of(outputFilePath), outputFormat.equals("bin"));
-        zorthCompiler.compile();
+        try {
+            zorthCompiler.compile(true);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
     }
 }

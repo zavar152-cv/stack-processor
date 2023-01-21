@@ -6,7 +6,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class LauncherTest {
+public class LauncherFullTest {
     @Test
     public void launch() throws URISyntaxException {
         URL resource = getClass().getClassLoader().getResource("program.zorth");
