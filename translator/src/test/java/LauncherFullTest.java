@@ -13,7 +13,7 @@ public class LauncherFullTest {
         assert resource != null;
         Path path = Paths.get(resource.toURI());
         Path home = Path.of(System.getProperty("user.home"));
-        String[] args = {"-i", path.toString(), "-o", String.valueOf(home), "-f", "mne"};
+        String[] args = {"-i", path.toString(), "-o", String.valueOf(home), "-f", "bin", "-d", "true"};
         Launcher.main(args);
     }
 }

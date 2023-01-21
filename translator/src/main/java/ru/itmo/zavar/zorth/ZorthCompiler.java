@@ -1,5 +1,6 @@
 package ru.itmo.zavar.zorth;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.exception.InvalidFunctionNameException;
@@ -9,7 +10,6 @@ import ru.itmo.zavar.exception.UnknownWordException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -21,11 +21,17 @@ public class ZorthCompiler {
     private final Path outputFilePath;
     private final boolean isBinary;
 
+    @Getter
     private final Map<AbstractMap.SimpleEntry<String, Integer>, Integer> functionAddressTable = new LinkedHashMap<>(); // (name, length), address
+    @Getter
     private final HashMap<String, Integer> variableAddressTable = new HashMap<>(); // name, address
+    @Getter
     private final HashMap<Long, Integer> literalAddressTable = new HashMap<>(); // value, address
+    @Getter
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> functionsProgram = new ArrayList<>();
+    @Getter
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> mainProgram = new ArrayList<>();
+    @Getter
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> program = new ArrayList<>();
     private final ArrayList<Long> data = new ArrayList<>();
     private boolean isFunction = false;
@@ -145,15 +151,16 @@ public class ZorthCompiler {
     }
 
     public void saveProgramAndData() throws IOException {
-        if(isBinary) {
+        if (isBinary) {
             Path programPath = outputFilePath.resolve("compiled.bin");
             Files.createFile(programPath);
+            final int addrShift = 24;
             program.forEach(entry -> {
                 byte[] bytes;
-                if(!entry.getValue().isEmpty()) {
-                    bytes = InstructionCode.longToBytes((entry.getKey().getBinary().longValue() << 24) + Integer.parseInt(entry.getValue()));
+                if (!entry.getValue().isEmpty()) {
+                    bytes = InstructionCode.longToBytes((entry.getKey().getBinary().longValue() << addrShift) + Integer.parseInt(entry.getValue()));
                 } else {
-                    bytes = InstructionCode.longToBytes((entry.getKey().getBinary().longValue() << 24));
+                    bytes = InstructionCode.longToBytes((entry.getKey().getBinary().longValue() << addrShift));
                 }
                 try {
                     Files.write(programPath, bytes, StandardOpenOption.APPEND);
@@ -177,7 +184,7 @@ public class ZorthCompiler {
             Files.createFile(programPath);
             program.forEach(entry -> {
                 String ins = "";
-                if(!entry.getValue().isEmpty()) {
+                if (!entry.getValue().isEmpty()) {
                     ins = entry.getKey().getMnemonic() + " " + entry.getValue();
                 } else {
                     ins = entry.getKey().getMnemonic();
@@ -193,9 +200,9 @@ public class ZorthCompiler {
             Path dataPath = outputFilePath.resolve("data.dz");
             Files.createFile(dataPath);
             data.forEach(aLong -> {
-                String data = String.valueOf(aLong);
+                String d = String.valueOf(aLong);
                 try {
-                    Files.writeString(dataPath, data, StandardOpenOption.APPEND);
+                    Files.writeString(dataPath, d, StandardOpenOption.APPEND);
                     Files.writeString(dataPath, "\n", StandardOpenOption.APPEND);
                 } catch (IOException e) {
                     throw new RuntimeException(e);

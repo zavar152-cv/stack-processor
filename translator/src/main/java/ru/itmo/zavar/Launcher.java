@@ -26,6 +26,10 @@ public final class Launcher {
         format.setRequired(true);
         options.addOption(format);
 
+        Option debugOption = new Option("d", "debug", true, "debug");
+        debugOption.setRequired(true);
+        options.addOption(debugOption);
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;
@@ -41,14 +45,15 @@ public final class Launcher {
         String inputFilePath = cmd.getOptionValue("input");
         String outputFilePath = cmd.getOptionValue("output");
         String outputFormat = cmd.getOptionValue("format");
+        boolean debug = Boolean.parseBoolean(cmd.getOptionValue("debug"));
 
         ZorthCompiler zorthCompiler = new ZorthCompiler(Path.of(inputFilePath), Path.of(outputFilePath), outputFormat.equals("bin"));
         try {
-            zorthCompiler.compile(true);
-            zorthCompiler.linkage(true);
+            zorthCompiler.compile(debug);
+            zorthCompiler.linkage(debug);
             zorthCompiler.saveProgramAndData();
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             System.exit(1);
         }
     }
