@@ -97,6 +97,7 @@
                         <exclude>ru/itmo/zavar/exception/RsEmpty.class</exclude>
                         <exclude>ru/itmo/zavar/exception/DsEmpty.class</exclude>
                         <exclude>ru/itmo/zavar/Processor.class</exclude>
+                        <exclude>ru/itmo/zavar/Launcher.class</exclude>
                         <exclude>ru/itmo/zavar/log/TickLog.class</exclude>
                     </excludes>
                 </configuration>

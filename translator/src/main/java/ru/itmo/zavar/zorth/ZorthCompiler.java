@@ -153,6 +153,7 @@ public class ZorthCompiler {
     public void saveProgramAndData() throws IOException {
         if (isBinary) {
             Path programPath = outputFilePath.resolve("compiled.bin");
+            Files.deleteIfExists(programPath);
             Files.createFile(programPath);
             final int addrShift = 24;
             program.forEach(entry -> {
@@ -170,6 +171,7 @@ public class ZorthCompiler {
             });
 
             Path dataPath = outputFilePath.resolve("data.dbin");
+            Files.deleteIfExists(dataPath);
             Files.createFile(dataPath);
             data.forEach(aLong -> {
                 byte[] bytes = InstructionCode.longToBytes(aLong);
@@ -181,6 +183,7 @@ public class ZorthCompiler {
             });
         } else {
             Path programPath = outputFilePath.resolve("compiled.z");
+            Files.deleteIfExists(programPath);
             Files.createFile(programPath);
             program.forEach(entry -> {
                 String ins = "";
@@ -198,6 +201,7 @@ public class ZorthCompiler {
             });
 
             Path dataPath = outputFilePath.resolve("data.dz");
+            Files.deleteIfExists(dataPath);
             Files.createFile(dataPath);
             data.forEach(aLong -> {
                 String d = String.valueOf(aLong);
@@ -362,12 +366,14 @@ public class ZorthCompiler {
                 try {
                     while (!word.endsWith("\"")) {
                         word = listIterator.next();
+                        str.append(" ");
                         str.append(word);
                     }
                 } catch (NoSuchElementException e) {
                     throw new InvalidStringException("Invalid string format at " + (listIterator.previousIndex() + 1));
                 }
-                str.chars().forEach(value -> {
+                String s = str.substring(0, str.length() - 1);
+                s.chars().forEach(value -> {
                     literalAddressTable.put((long) value, 0);
                     temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.LIT, "lit$" + (long) value));
                     temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.ADDR, "2"));
