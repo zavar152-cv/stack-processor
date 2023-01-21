@@ -1,5 +1,5 @@
 : buzz 5 5 AND 1 = ;
-: bizz 3 6 AND OR NEG 1 = ;
+: bizz 3 6 do AND OR loop NEG 1 = ;
 3 1 +
 4 3 -
 5 2 *
@@ -7,4 +7,5 @@ variable data
 buzz
 data @
 bizz
-do 9 8 + loop
+do 9 8 do 97 EMIT data loop + loop
+variable foo

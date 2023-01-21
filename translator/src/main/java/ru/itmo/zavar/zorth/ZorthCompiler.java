@@ -21,7 +21,6 @@ public class ZorthCompiler {
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> functionsProgram = new ArrayList<>();
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> mainProgram = new ArrayList<>();
     private final ArrayList<Long> data = new ArrayList<>();
-    private Long currentFunctionLength = 0L;
     private boolean isFunction = false;
 
     public void compile() {
@@ -74,7 +73,6 @@ public class ZorthCompiler {
     // TODO errors
     private void parseFunction(final ListIterator<String> listIterator) {
         try {
-            currentFunctionLength = 1L;
             listIterator.next(); //skip :
             String name = listIterator.next();
             if (!name.matches("([A-Z]|[a-z]|[0-9])+")) {
@@ -90,32 +88,34 @@ public class ZorthCompiler {
             } catch (NoSuchElementException e) {
                 throw new NoSuchElementException("Missing \";\" at " + (listIterator.previousIndex() + 1));
             }
-            parseWords(funcTokens.listIterator());
+            long c = parseWords(funcTokens.listIterator()) + 1;
             functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.EXIT, ""));
-            functionAddressTable.put(new AbstractMap.SimpleEntry<>(name, currentFunctionLength), 0);
+            functionAddressTable.put(new AbstractMap.SimpleEntry<>(name, c), 0);
         } catch (Exception e) {
             throw new IllegalArgumentException((e.getMessage() != null ? e.getMessage() : ""));
         }
     }
 
-    private void parseWords(final ListIterator<String> listIterator) {
+    private int parseWords(final ListIterator<String> listIterator) {
         if (listIterator.hasNext()) {
             String next = listIterator.next();
+            int count = 0;
             if (next.equals("do")) {
                 listIterator.previous();
-                parseLoop(listIterator);
+                count = parseLoop(listIterator);
             } else if (next.equals("if")) {
                 listIterator.previous();
-                parseIf(listIterator);
+                count = parseIf(listIterator);
             } else {
                 listIterator.previous();
-                parseWord(listIterator);
+                count = parseWord(listIterator);
             }
-            parseWords(listIterator);
+            return parseWords(listIterator) + count;
         }
+        return 0;
     }
 
-    private void parseWord(final ListIterator<String> listIterator) {
+    private int parseWord(final ListIterator<String> listIterator) {
         String word = listIterator.next();
         ZorthPrimitives primitive = ZorthPrimitives.byValue(word);
         ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> temp = new ArrayList<>();
@@ -151,7 +151,8 @@ public class ZorthCompiler {
                     temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.ADDR, "1"));
                     temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.FT, ""));
                 }
-                default -> { }
+                default -> {
+                }
             }
         } else {
             if (word.equals("variable")) {
@@ -159,8 +160,9 @@ public class ZorthCompiler {
                 String finalWord = word;
                 if (variableAddressTable.containsKey(word)) {
                     throw new IllegalArgumentException("Variable \"" + word + "\" is already exists, at " + (listIterator.previousIndex() + 1));
-                } else if(functionAddressTable.keySet().stream().anyMatch(s -> s.getKey().equals(finalWord))) {
-                    throw new IllegalArgumentException("Variable can't be created. Function \"" + word + "\" is already exists, at " + (listIterator.previousIndex() + 1));
+                } else if (functionAddressTable.keySet().stream().anyMatch(s -> s.getKey().equals(finalWord))) {
+                    throw new IllegalArgumentException("Variable can't be created. Function \"" + word + "\" is already exists, "
+                            + "at " + (listIterator.previousIndex() + 1));
                 } else {
                     variableAddressTable.put(word, 0);
                 }
@@ -187,35 +189,44 @@ public class ZorthCompiler {
         }
 
         if (isFunction) {
-            currentFunctionLength += temp.size();
             functionsProgram.addAll(temp);
         } else {
             mainProgram.addAll(temp);
         }
+        return temp.size();
     }
 
-    private void parseIf(final ListIterator<String> listIterator) {
+    private int parseIf(final ListIterator<String> listIterator) {
         listIterator.next(); // skip "if"
+        return 0;
     }
 
-    private void parseLoop(final ListIterator<String> listIterator) {
+    private int parseLoop(final ListIterator<String> listIterator) {
         listIterator.next(); // skip "do"
         ArrayList<String> loopTokens = new ArrayList<>();
         String t = listIterator.next();
+        long doCount = 1;
+        long loopCount = 0;
         try {
-            while (!t.equals("loop")) {
+            while (loopCount != doCount) {
                 loopTokens.add(t);
                 t = listIterator.next();
+                if (t.equals("loop")) {
+                    loopCount++;
+                }
+                if (t.equals("do")) {
+                    doCount++;
+                }
             }
         } catch (NoSuchElementException e) {
-            throw new NoSuchElementException("Missing \"loop\" at " + (listIterator.previousIndex() + 1));
+            throw new NoSuchElementException("Missing \"loop\" at " + (listIterator.previousIndex() + 1)); //TODO fix position
         }
-        parseWords(loopTokens.listIterator());
+        int count = parseWords(loopTokens.listIterator());
         if (isFunction) {
-            currentFunctionLength++;
-            functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.LOOP, "loop$" + loopTokens.size()));
+            functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.LOOP, "loop$" + count));
         } else {
-            mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.LOOP, "loop$" + loopTokens.size()));
+            mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.LOOP, "loop$" + count));
         }
+        return count + 1;
     }
 }
