@@ -1,6 +1,6 @@
 : buzz 5 5 AND 1 = ; //simple function
-: bizz 3 6 do AND do OR loop loop NEG 1 = ; //function with nested loop
-: bazz 4 1 if AND if OR = 1 endif XOR = endif ; //function with nested if
+: bazz 3 6 do AND do OR loop loop NEG 1 = ; //function with nested loop
+: bizz 4 1 if AND if OR = 1 endif XOR = endif ; //function with nested if
 //test comment
 3 1 +
 4 3 -

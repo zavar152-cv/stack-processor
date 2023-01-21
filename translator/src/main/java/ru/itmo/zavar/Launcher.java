@@ -45,6 +45,7 @@ public final class Launcher {
         ZorthCompiler zorthCompiler = new ZorthCompiler(Path.of(inputFilePath), Path.of(outputFilePath), outputFormat.equals("bin"));
         try {
             zorthCompiler.compile(true);
+            zorthCompiler.linkage(true);
         } catch (Exception e) {
             System.err.println(e.getMessage());
             System.exit(1);

@@ -19,11 +19,12 @@ public class ZorthCompiler {
     private final Path outputFilePath;
     private final boolean isBinary;
 
-    private final HashMap<AbstractMap.SimpleEntry<String, Long>, Integer> functionAddressTable = new HashMap<>(); // (name, length), address
+    private final Map<AbstractMap.SimpleEntry<String, Integer>, Integer> functionAddressTable = new LinkedHashMap<>(); // (name, length), address
     private final HashMap<String, Integer> variableAddressTable = new HashMap<>(); // name, address
     private final HashMap<Long, Integer> literalAddressTable = new HashMap<>(); // value, address
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> functionsProgram = new ArrayList<>();
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> mainProgram = new ArrayList<>();
+    private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> program = new ArrayList<>();
     private final ArrayList<Long> data = new ArrayList<>();
     private boolean isFunction = false;
 
@@ -48,10 +49,90 @@ public class ZorthCompiler {
         mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.HALT, ""));
 
         if (debug) {
-            System.out.println("Parsed main:");
-            mainProgram.forEach(ins -> System.out.println(ins.getKey() + " " + ins.getValue()));
-            System.out.println("Parsed functions:");
-            functionsProgram.forEach(ins -> System.out.println(ins.getKey() + " " + ins.getValue()));
+            System.out.println("Compilation:\n");
+            printCompilerDebug();
+        }
+    }
+
+    public void linkage(final boolean debug) {
+        final int startAddress = 3;
+        for (int i = 0; i < literalAddressTable.size() + variableAddressTable.size() + startAddress; i++) {
+            data.add(0L);
+        }
+        int i = startAddress;
+        for (Long literal : literalAddressTable.keySet()) {
+            data.set(i, literal);
+            literalAddressTable.replace(literal, i);
+            i++;
+        }
+
+        for (String varName : variableAddressTable.keySet()) {
+            data.set(i, 0L);
+            variableAddressTable.replace(varName, i);
+            i++;
+        }
+
+        int mainProgramLastAddress = mainProgram.size() - 1;
+        int nextFuncAddress = mainProgramLastAddress + 1;
+
+        for (var funcEntry : functionAddressTable.keySet()) {
+            functionAddressTable.replace(funcEntry, nextFuncAddress);
+            nextFuncAddress = nextFuncAddress + funcEntry.getValue();
+        }
+        program.addAll(mainProgram);
+        program.addAll(functionsProgram);
+        int currentAddress = 0;
+        for (AbstractMap.SimpleEntry<InstructionCode, String> entry : program) {
+            String[] addressArray = entry.getValue().split("\\$");
+            if (addressArray.length == 2) {
+                switch (addressArray[0]) {
+                    case "lit": {
+                        Integer address = literalAddressTable.get(Long.parseLong(addressArray[1]));
+                        int index = program.indexOf(entry);
+                        entry.setValue(address.toString());
+                        program.set(index, entry);
+                        break;
+                    }
+                    case "var": {
+                        Integer address = variableAddressTable.get(addressArray[1]);
+                        int index = program.indexOf(entry);
+                        entry.setValue(address.toString());
+                        program.set(index, entry);
+                        break;
+                    }
+                    case "fun": {
+                        AbstractMap.SimpleEntry<String, Integer> simpleEntry = functionAddressTable.keySet().stream().
+                                filter(s -> s.getKey().equals(addressArray[1])).findFirst().orElse(null);
+                        Integer address = functionAddressTable.get(simpleEntry);
+                        int index = program.indexOf(entry);
+                        entry.setValue(address.toString());
+                        program.set(index, entry);
+                        break;
+                    }
+                    case "loop": {
+                        int address = currentAddress - Integer.parseInt(addressArray[1]);
+                        int index = program.indexOf(entry);
+                        entry.setValue(Integer.toString(address));
+                        program.set(index, entry);
+                        break;
+                    }
+                    case "if": {
+                        int address = currentAddress + Integer.parseInt(addressArray[1]);
+                        int index = program.indexOf(entry);
+                        entry.setValue(Integer.toString(address));
+                        program.set(index, entry);
+                        break;
+                    }
+                    default: {
+                        throw new NoSuchElementException("Invalid address placeholder: " + addressArray[0]);
+                    }
+                }
+            }
+            currentAddress++;
+        }
+
+        if (debug) {
+            System.out.println("\nLinkage:\n");
             System.out.println("\nFunction table:");
             functionAddressTable.forEach((e, integer) -> {
                 System.out.println(e.getKey() + ", size:" + e.getValue() + ", address:" + integer);
@@ -64,7 +145,27 @@ public class ZorthCompiler {
             variableAddressTable.forEach((string, integer) -> {
                 System.out.println(string + ", address:" + integer);
             });
+            program.forEach(ins -> System.out.println(ins.getKey().getMnemonic() + " " + ins.getValue()));
         }
+    }
+
+    private void printCompilerDebug() {
+        System.out.println("Compiled main:");
+        mainProgram.forEach(ins -> System.out.println(ins.getKey().getMnemonic() + " " + ins.getValue()));
+        System.out.println("Compiled functions:");
+        functionsProgram.forEach(ins -> System.out.println(ins.getKey().getMnemonic() + " " + ins.getValue()));
+        System.out.println("\nFunction table:");
+        functionAddressTable.forEach((e, integer) -> {
+            System.out.println(e.getKey() + ", size:" + e.getValue() + ", address:" + integer);
+        });
+        System.out.println("\nLiteral table:");
+        literalAddressTable.forEach((aLong, integer) -> {
+            System.out.println(aLong + ", address:" + integer);
+        });
+        System.out.println("\nVar table:");
+        variableAddressTable.forEach((string, integer) -> {
+            System.out.println(string + ", address:" + integer);
+        });
     }
 
     private void parseBase(final ListIterator<String> listIterator) {
@@ -100,7 +201,7 @@ public class ZorthCompiler {
             } catch (NoSuchElementException e) {
                 throw new NoSuchElementException("Missing \";\" at " + (listIterator.previousIndex() + 1));
             }
-            long c = parseWords(funcTokens.listIterator()) + 1;
+            int c = parseWords(funcTokens.listIterator()) + 1;
             functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.EXIT, ""));
             functionAddressTable.put(new AbstractMap.SimpleEntry<>(name, c), 0);
         } catch (Exception e) {
