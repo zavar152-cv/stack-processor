@@ -86,46 +86,39 @@ public class ZorthCompiler {
             String[] addressArray = entry.getValue().split("\\$");
             if (addressArray.length == 2) {
                 switch (addressArray[0]) {
-                    case "lit": {
+                    case "lit" -> {
                         Integer address = literalAddressTable.get(Long.parseLong(addressArray[1]));
                         int index = program.indexOf(entry);
                         entry.setValue(address.toString());
                         program.set(index, entry);
-                        break;
                     }
-                    case "var": {
+                    case "var" -> {
                         Integer address = variableAddressTable.get(addressArray[1]);
                         int index = program.indexOf(entry);
                         entry.setValue(address.toString());
                         program.set(index, entry);
-                        break;
                     }
-                    case "fun": {
+                    case "fun" -> {
                         AbstractMap.SimpleEntry<String, Integer> simpleEntry = functionAddressTable.keySet().stream().
                                 filter(s -> s.getKey().equals(addressArray[1])).findFirst().orElse(null);
                         Integer address = functionAddressTable.get(simpleEntry);
                         int index = program.indexOf(entry);
                         entry.setValue(address.toString());
                         program.set(index, entry);
-                        break;
                     }
-                    case "loop": {
+                    case "loop" -> {
                         int address = currentAddress - Integer.parseInt(addressArray[1]);
                         int index = program.indexOf(entry);
                         entry.setValue(Integer.toString(address));
                         program.set(index, entry);
-                        break;
                     }
-                    case "if": {
+                    case "if" -> {
                         int address = currentAddress + Integer.parseInt(addressArray[1]);
                         int index = program.indexOf(entry);
                         entry.setValue(Integer.toString(address));
                         program.set(index, entry);
-                        break;
                     }
-                    default: {
-                        throw new NoSuchElementException("Invalid address placeholder: " + addressArray[0]);
-                    }
+                    default -> throw new NoSuchElementException("Invalid address placeholder: " + addressArray[0]);
                 }
             }
             currentAddress++;
