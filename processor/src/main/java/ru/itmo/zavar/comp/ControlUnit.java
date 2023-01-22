@@ -46,7 +46,7 @@ public final class ControlUnit {
         final Integer charAddress = 2;
         ip.writeValue(0);
         ar.writeValue(0);
-        cr.writeValue(InstructionCode.NOPE.getBinary().longValue());
+        cr.writeValue(InstructionCode.NOPE.getBinary().longValue() << opcodeOffset);
         resetTick();
         dataPath = new DataPath(data, ip, ar, inputAddress, byteAddress, charAddress, dataMemorySize, dataBits, input);
         programMemory = new ProtectedMemory(programMemorySize, programBits, program);
@@ -90,7 +90,7 @@ public final class ControlUnit {
 
     private void onEveryControlUnitTick() {
         controlUnitTicks++;
-        TickLog tickLog = new TickLog(controlUnitTicks, readTick(), stage, (cr.readValue() >> opcodeOffset),
+        TickLog tickLog = new TickLog(controlUnitTicks, readTick(), stage, cr.readValue(),
                 InstructionCode.valueByBinary(Long.toBinaryString(cr.readValue() >> opcodeOffset)), ip.readValue(),
                 ar.readValue(), dataPath.getTosValue(), dataPath.getDsValue(), dataPath.getRsValue(),
                 dataPath.getOutputString(), dataPath.getInputToken());
