@@ -1,5 +1,6 @@
 package ru.itmo.zavar.comp;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import ru.itmo.zavar.alu.Alu;
 import ru.itmo.zavar.alu.AluOperation;
 import ru.itmo.zavar.base.mem.DataMemoryController;
@@ -17,6 +18,7 @@ import ru.itmo.zavar.io.OutputDevice;
 import java.util.ArrayList;
 import java.util.Stack;
 
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 public final class DataPath {
     private final Stack<Long> dataStack = new Stack<>();
     private final Stack<Long> returnStack = new Stack<>();

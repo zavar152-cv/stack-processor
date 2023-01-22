@@ -1,9 +1,11 @@
 package ru.itmo.zavar.base.mem;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.RequiredArgsConstructor;
 import ru.itmo.zavar.io.InputDevice;
 import ru.itmo.zavar.io.OutputDevice;
 
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 @RequiredArgsConstructor
 public final class DataMemoryController {
     private final Memory memory;

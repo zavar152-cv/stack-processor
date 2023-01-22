@@ -1,9 +1,11 @@
 package ru.itmo.zavar.io;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import ru.itmo.zavar.exception.OutOfInputException;
 
 import java.util.Stack;
 
+@SuppressFBWarnings({"EI_EXPOSE_REP2", "EI_EXPOSE_REP"})
 public record InputDevice(Integer address, Stack<Character> tokens) {
     public Long read() throws OutOfInputException {
         if (tokens().empty()) {
