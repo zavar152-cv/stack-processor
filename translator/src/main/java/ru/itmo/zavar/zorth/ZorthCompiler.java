@@ -1,6 +1,5 @@
 package ru.itmo.zavar.zorth;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.exception.InvalidFunctionNameException;
@@ -21,17 +20,11 @@ public class ZorthCompiler {
     private final Path outputFilePath;
     private final boolean isBinary;
 
-    @Getter
     private final Map<AbstractMap.SimpleEntry<String, Integer>, Integer> functionAddressTable = new LinkedHashMap<>(); // (name, length), address
-    @Getter
     private final HashMap<String, Integer> variableAddressTable = new HashMap<>(); // name, address
-    @Getter
     private final HashMap<Long, Integer> literalAddressTable = new HashMap<>(); // value, address
-    @Getter
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> functionsProgram = new ArrayList<>();
-    @Getter
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> mainProgram = new ArrayList<>();
-    @Getter
     private final ArrayList<AbstractMap.SimpleEntry<InstructionCode, String>> program = new ArrayList<>();
     private final ArrayList<Long> data = new ArrayList<>();
     private boolean isFunction = false;
@@ -41,6 +34,9 @@ public class ZorthCompiler {
         try (BufferedReader bufferedReader = Files.newBufferedReader(inputFilePath)) {
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
+                if (line == null) {
+                    throw new IOException();
+                }
                 line = line.replaceAll("//+.*", "");
                 if (!line.isEmpty()) {
                     tokens.addAll(Arrays.stream(line.split(" ")).toList());
@@ -453,5 +449,33 @@ public class ZorthCompiler {
             mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.LOOP, "loop$" + count));
         }
         return count + 1;
+    }
+
+    public List<Long> getData() {
+        return Collections.unmodifiableList(data);
+    }
+
+    public List<AbstractMap.SimpleEntry<InstructionCode, String>> getFunctionsProgram() {
+        return Collections.unmodifiableList(functionsProgram);
+    }
+
+    public List<AbstractMap.SimpleEntry<InstructionCode, String>> getMainProgram() {
+        return Collections.unmodifiableList(mainProgram);
+    }
+
+    public List<AbstractMap.SimpleEntry<InstructionCode, String>> getProgram() {
+        return Collections.unmodifiableList(program);
+    }
+
+    public Map<Long, Integer> getLiteralAddressTable() {
+        return Collections.unmodifiableMap(literalAddressTable);
+    }
+
+    public Map<String, Integer> getVariableAddressTable() {
+        return Collections.unmodifiableMap(variableAddressTable);
+    }
+
+    public Map<AbstractMap.SimpleEntry<String, Integer>, Integer> getFunctionAddressTable() {
+        return Collections.unmodifiableMap(functionAddressTable);
     }
 }

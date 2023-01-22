@@ -1,5 +1,6 @@
 package ru.itmo.zavar.comp;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.alu.AluOperation;
 import ru.itmo.zavar.base.mem.ProtectedMemory;
@@ -13,6 +14,8 @@ import ru.itmo.zavar.exception.ReservedInstructionException;
 import ru.itmo.zavar.log.TickLog;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public final class ControlUnit {
     private final DataPath dataPath;
@@ -24,6 +27,7 @@ public final class ControlUnit {
     private Long controlUnitTicks;
     private boolean stopped = true;
     private Stage stage;
+    @SuppressFBWarnings("SS_SHOULD_BE_STATIC")
     private final int opcodeOffset = 24;
     private final ArrayList<TickLog> tickLogs = new ArrayList<>();
     private final boolean printDebug;
@@ -96,8 +100,8 @@ public final class ControlUnit {
         tickLogs.add(tickLog);
     }
 
-    public ArrayList<TickLog> getTickLog() {
-        return tickLogs;
+    public List<TickLog> getTickLog() {
+        return Collections.unmodifiableList(tickLogs);
     }
 
     /**
