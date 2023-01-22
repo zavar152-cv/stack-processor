@@ -51,7 +51,11 @@ public class CatTest {
 
         Files.deleteIfExists(home.resolve("input"));
         Files.createFile(home.resolve("input"));
-        Files.writeString(home.resolve("input"), "foo\n", StandardOpenOption.APPEND);
+        Files.writeString(home.resolve("input"), """
+                {
+                   "tokens": ["f", "o", "o", "\\n"]
+                }""",
+                StandardOpenOption.APPEND);
         String[] argsProcessor = {"-p", home.resolve("compiled.bin").toString(), "-d",
                 home.resolve("data.dbin").toString(), "-dg", "true", "-i", home.resolve("input").toString()};
         Processor.main(argsProcessor);

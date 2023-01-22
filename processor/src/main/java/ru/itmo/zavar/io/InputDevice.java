@@ -16,6 +16,8 @@ public record InputDevice(Integer address, Stack<String> tokens) {
             return (long) Character.digit(tokens.pop().charAt(0), radix);
         } else if (tokens.peek().length() == 1 && Character.isLetter(tokens.peek().charAt(0))) {
             return (long) tokens.pop().charAt(0);
+        } else if (Character.isDefined(tokens.peek().charAt(0))) {
+            return (long) tokens.pop().charAt(0);
         } else {
             return Long.parseLong(tokens.pop());
         }
