@@ -80,7 +80,7 @@ public class Processor {
         try {
             controlUnit.start();
         } catch (ControlUnitException e) {
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
         log = controlUnit.getTickLog();
         System.out.println("Output from processor: " + StringEscapeUtils.escapeJava(log.get(log.size() - 1).out()));
