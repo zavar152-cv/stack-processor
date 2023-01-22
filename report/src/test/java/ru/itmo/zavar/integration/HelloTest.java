@@ -49,7 +49,10 @@ public class HelloTest {
 
         Files.deleteIfExists(home.resolve("input"));
         Files.createFile(home.resolve("input"));
-        Files.writeString(home.resolve("input"), "", StandardOpenOption.APPEND);
+        Files.writeString(home.resolve("input"), """
+                {
+                   "tokens": []
+                }""", StandardOpenOption.APPEND);
         String[] argsProcessor = {"-p", home.resolve("compiled.bin").toString(), "-d",
                 home.resolve("data.dbin").toString(), "-dg", "true", "-i", home.resolve("input").toString()};
         Processor.main(argsProcessor);
