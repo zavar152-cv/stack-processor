@@ -16,9 +16,9 @@ public final class Alu {
     public void calculate() {
         switch (operation) {
             case PLUS -> output = rightInput + leftInput;
-            case MINUS -> output = rightInput - leftInput;
+            case MINUS -> output = leftInput - rightInput;
             case MULTIPLY -> output = rightInput * leftInput;
-            case DIVIDE -> output = rightInput / leftInput;
+            case DIVIDE -> output = leftInput / rightInput;
             case AND -> output = rightInput & leftInput;
             case OR -> output = rightInput | leftInput;
             case XOR -> output = rightInput ^ leftInput;
