@@ -11,6 +11,9 @@ data @
 2 data ! / NOT < >
 DROP DUP OVER
 .
+INC
+DEC
+!=
 IN
 SWAP
 bizz

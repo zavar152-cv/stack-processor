@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import ru.itmo.zavar.Launcher;
+import ru.itmo.zavar.Translator;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -14,6 +14,6 @@ public class AllCommandsTest {
         Path path = Paths.get(resource.toURI());
         Path home = Path.of(System.getProperty("user.home"));
         String[] args = {"-i", path.toString(), "-o", String.valueOf(home), "-f", "mne", "-d", "true"};
-        Launcher.main(args);
+        Translator.main(args);
     }
 }

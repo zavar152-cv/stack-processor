@@ -35,7 +35,10 @@ public enum InstructionCode {
     NOPE("0011010", "NOPE"),
     EXIT("0011011", "EXIT"),
     NOT("0011100", "NOT"),
-    ADDR("0011101", "[ADDR]", true); //TODO reserved
+    ADDR("0011101", "[ADDR]", true),
+    INC("0011110", "INC"),
+    DEC("0011111", "DEC"),
+    NEQ("0100000", "NEQ");
 
     private final Short binary;
     private final String mnemonic;

@@ -244,6 +244,32 @@ public final class ControlUnit {
                 dataPath.writeTos();
                 incTick();
             }
+            case INC -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT_INC); // TOS ← TOS + 1
+                dataPath.writeTos();
+                incTick();
+            }
+            case DEC -> {
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.RIGHT_DEC); // TOS ← TOS + 1
+                dataPath.writeTos();
+                incTick();
+            }
+            case NEQ -> {
+                dataPath.selectLalu(LeftAluInputMux.FROM_DS);
+                dataPath.selectRalu(RightAluInputMux.FROM_TOS);
+                dataPath.selectOut(AluOutputMux.TO_TOS);
+                dataPath.readDs();
+                dataPath.readTos();
+                dataPath.selectOp(AluOperation.NEQ); // TOS ← TOS != POP(DS)
+                dataPath.writeTos();
+                incTick();
+            }
             case EQ -> {
                 dataPath.selectLalu(LeftAluInputMux.FROM_DS);
                 dataPath.selectRalu(RightAluInputMux.FROM_TOS);

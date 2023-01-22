@@ -1,5 +1,6 @@
 package ru.itmo.zavar.log;
 
+import org.apache.commons.text.StringEscapeUtils;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.comp.Stage;
 
@@ -16,7 +17,7 @@ public record TickLog(Long controlUnitTicks, Byte tc, Stage stage, Long cr, Inst
         System.out.print(", TOS: " + tos);
         System.out.print(", DS: " + ds);
         System.out.print(", RS: " + rs);
-        System.out.print(", OUT: " + out);
-        System.out.println(", IN: " + in);
+        System.out.print(", OUT: " + StringEscapeUtils.escapeJava(out));
+        System.out.println(", IN: " + StringEscapeUtils.escapeJava(in));
     }
 }

@@ -3,12 +3,13 @@ package ru.itmo.zavar;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.cli.*;
-import ru.itmo.zavar.zorth.ZorthCompiler;
+import ru.itmo.zavar.zorth.ZorthTranslator;
 
 import java.nio.file.Path;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Launcher {
+public final class Translator {
+    private static ZorthTranslator zorthTranslator;
     public static void main(final String[] args) {
         Options options = new Options();
 
@@ -47,14 +48,18 @@ public final class Launcher {
         String outputFormat = cmd.getOptionValue("format");
         boolean debug = Boolean.parseBoolean(cmd.getOptionValue("debug"));
 
-        ZorthCompiler zorthCompiler = new ZorthCompiler(Path.of(inputFilePath), Path.of(outputFilePath), outputFormat.equals("bin"));
+        zorthTranslator = new ZorthTranslator(Path.of(inputFilePath), Path.of(outputFilePath), outputFormat.equals("bin"));
         try {
-            zorthCompiler.compile(debug);
-            zorthCompiler.linkage(debug);
-            zorthCompiler.saveProgramAndData();
+            zorthTranslator.compile(debug);
+            zorthTranslator.linkage(debug);
+            zorthTranslator.saveProgramAndData();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    public static ZorthTranslator getZorthTranslator() {
+        return zorthTranslator;
     }
 }

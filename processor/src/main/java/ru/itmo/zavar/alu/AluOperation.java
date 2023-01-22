@@ -9,6 +9,7 @@ public enum AluOperation {
     OR,
     XOR,
     EQ,
+    NEQ,
     GR,
     LE,
     RIGHT,

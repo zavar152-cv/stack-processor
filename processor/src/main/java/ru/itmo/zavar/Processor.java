@@ -4,18 +4,22 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import ru.itmo.zavar.comp.ControlUnit;
 import ru.itmo.zavar.exception.ControlUnitException;
+import ru.itmo.zavar.log.TickLog;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Processor {
+    private static List<TickLog> log;
     public static void main(final String[] args) throws IOException {
         Options options = new Options();
 
@@ -73,7 +77,12 @@ public class Processor {
         } catch (ControlUnitException e) {
             System.err.println(e.getMessage());
         }
+        log = controlUnit.getTickLog();
+        System.out.println("Output from processor: " + StringEscapeUtils.escapeJava(log.get(log.size() - 1).out()));
+    }
 
+    public static List<TickLog> getLog() {
+        return Collections.unmodifiableList(log);
     }
 
     private static <T> List<T[]> splitArray(final T[] array) {

@@ -27,6 +27,7 @@ public final class Alu {
             case LEFT_NOT -> output = -leftInput;
             case LEFT_BNOT -> output = ~leftInput;
             case EQ -> output = rightInput.equals(leftInput) ? 1L : 0L;
+            case NEQ -> output = rightInput.equals(leftInput) ? 0L : 1L;
             case GR -> output = rightInput > leftInput ? 1L : 0L;
             case LE -> output = rightInput < leftInput ? 1L : 0L;
             case RIGHT -> output = rightInput;

@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import ru.itmo.zavar.Launcher;
+import ru.itmo.zavar.Translator;
 import ru.itmo.zavar.Processor;
 
 import java.io.IOException;
@@ -18,12 +18,11 @@ public class CatTest {
         Path path = Paths.get(resource.toURI());
         Path home = Path.of(System.getProperty("user.home"));
         String[] argsLauncher = {"-i", path.toString(), "-o", String.valueOf(home), "-f", "bin", "-d", "true"};
-        Launcher.main(argsLauncher);
+        Translator.main(argsLauncher);
 
-        //-p C:\Users\yarus\compiled.bin -d C:\Users\yarus\data.dbin -dg true -i C:\Users\yarus\input
         Files.deleteIfExists(home.resolve("input"));
         Files.createFile(home.resolve("input"));
-        Files.writeString(home.resolve("input"), "hello cat!", StandardOpenOption.APPEND);
+        Files.writeString(home.resolve("input"), "foo\n", StandardOpenOption.APPEND);
         String[] argsProcessor = {"-p", home.resolve("compiled.bin").toString(), "-d",
                 home.resolve("data.dbin").toString(), "-dg", "true", "-i", home.resolve("input").toString()};
         Processor.main(argsProcessor);

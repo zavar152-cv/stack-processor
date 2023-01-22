@@ -15,7 +15,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 @RequiredArgsConstructor
-public class ZorthCompiler {
+public class ZorthTranslator {
     private final Path inputFilePath;
     private final Path outputFilePath;
     private final boolean isBinary;
@@ -314,6 +314,9 @@ public class ZorthCompiler {
                 case OVER -> temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.OVER, ""));
                 case ST -> temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.ST, ""));
                 case FT -> temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.FT, ""));
+                case DEC -> temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.DEC, ""));
+                case INC -> temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.INC, ""));
+                case NEQ -> temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.NEQ, ""));
                 case DOT -> {
                     temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.ADDR, "0"));
                     temp.add(new AbstractMap.SimpleEntry<>(InstructionCode.ST, ""));
