@@ -32,7 +32,7 @@ public class InputTest {
                    "tokens": ["a", "2", "3"]
                 }""");
         JSONArray input = (JSONArray) jsonObject.get("tokens");
-        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), input, true);
+        ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), input, false);
         Assertions.assertThrows(OutOfInputException.class, controlUnit::start);
     }
 }

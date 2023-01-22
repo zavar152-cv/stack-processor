@@ -14,9 +14,7 @@ public record InputDevice(Integer address, Stack<String> tokens) {
         if (tokens.peek().length() == 1 && Character.isDigit(tokens.peek().charAt(0))) {
             final int radix = 10;
             return (long) Character.digit(tokens.pop().charAt(0), radix);
-        } else if (tokens.peek().length() == 1 && Character.isLetter(tokens.peek().charAt(0))) {
-            return (long) tokens.pop().charAt(0);
-        } else if (Character.isDefined(tokens.peek().charAt(0))) {
+        } else if (tokens.peek().length() == 1 && Character.isDefined(tokens.peek().charAt(0))) {
             return (long) tokens.pop().charAt(0);
         } else {
             return Long.parseLong(tokens.pop());
