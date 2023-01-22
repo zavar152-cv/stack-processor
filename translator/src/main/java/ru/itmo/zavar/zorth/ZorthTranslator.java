@@ -53,7 +53,7 @@ public class ZorthTranslator {
         mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.HALT, ""));
 
         if (debug) {
-            System.out.println("Compilation:\n");
+            System.out.println("COMPILATION:\n");
             printCompilerDebug();
         }
     }
@@ -129,7 +129,7 @@ public class ZorthTranslator {
         }
 
         if (debug) {
-            System.out.println("\nLinkage:\n");
+            System.out.println("\nLINKAGE:\n");
             System.out.println("\nFunction table:");
             functionAddressTable.forEach((e, integer) -> {
                 System.out.println(e.getKey() + ", size:" + e.getValue() + ", address:" + integer);
@@ -142,6 +142,7 @@ public class ZorthTranslator {
             variableAddressTable.forEach((string, integer) -> {
                 System.out.println(string + ", address:" + integer);
             });
+            System.out.println("\nProgram:");
             program.forEach(ins -> System.out.println(ins.getKey().getMnemonic() + " " + ins.getValue()));
         }
     }
