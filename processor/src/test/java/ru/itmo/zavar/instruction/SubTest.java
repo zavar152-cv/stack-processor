@@ -24,7 +24,7 @@ public class SubTest {
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
         controlUnit.start();
         Assertions.assertEquals(22, controlUnit.getTickLog().get(21).controlUnitTicks());
-        Assertions.assertEquals(-24, controlUnit.getTickLog().get(21).tos());
+        Assertions.assertEquals(24, controlUnit.getTickLog().get(21).tos());
 
     }
 

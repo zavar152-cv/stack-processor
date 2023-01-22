@@ -13,7 +13,7 @@ public class AllCommandsTest {
         assert resource != null;
         Path path = Paths.get(resource.toURI());
         Path home = Path.of(System.getProperty("user.home"));
-        String[] args = {"-i", path.toString(), "-o", String.valueOf(home), "-f", "mne", "-d", "true"};
+        String[] args = {"-i", path.toString(), "-o", String.valueOf(home), "-f", "mne", "-d", "false"};
         Translator.main(args);
     }
 }

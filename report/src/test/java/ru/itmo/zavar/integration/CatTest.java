@@ -1,5 +1,6 @@
 package ru.itmo.zavar.integration;
 
+import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.itmo.zavar.InstructionCode;
@@ -20,7 +21,7 @@ import java.util.List;
 
 public class CatTest {
     @Test
-    public void launch() throws URISyntaxException, IOException {
+    public void launch() throws URISyntaxException, IOException, ParseException {
         URL resource = getClass().getClassLoader().getResource("cat.zorth");
         assert resource != null;
         Path path = Paths.get(resource.toURI());

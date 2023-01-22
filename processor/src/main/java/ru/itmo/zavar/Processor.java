@@ -5,6 +5,9 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import ru.itmo.zavar.comp.ControlUnit;
 import ru.itmo.zavar.exception.ControlUnitException;
 import ru.itmo.zavar.log.TickLog;
@@ -20,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Processor {
     private static List<TickLog> log;
-    public static void main(final String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException, org.json.simple.parser.ParseException {
         Options options = new Options();
 
         Option programOption = new Option("p", "program", true, "program path");
@@ -62,7 +65,9 @@ public class Processor {
         ArrayList<Long> program = new ArrayList<>();
         ArrayList<Long> data = new ArrayList<>();
 
-        String input = Files.readString(inputPath);
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(Files.newBufferedReader(inputPath));
+        JSONArray input = (JSONArray) jsonObject.get("tokens");
 
         byte[] bytesProg = Files.readAllBytes(programPath);
         List<Byte[]> instructions = splitArray(ArrayUtils.toObject(bytesProg));

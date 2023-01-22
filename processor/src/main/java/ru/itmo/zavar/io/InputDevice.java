@@ -6,16 +6,18 @@ import ru.itmo.zavar.exception.OutOfInputException;
 import java.util.Stack;
 
 @SuppressFBWarnings({"EI_EXPOSE_REP2", "EI_EXPOSE_REP"})
-public record InputDevice(Integer address, Stack<Character> tokens) {
+public record InputDevice(Integer address, Stack<String> tokens) {
     public Long read() throws OutOfInputException {
         if (tokens().empty()) {
             throw new OutOfInputException("Input device with address " + address + " is out of tokens");
         }
-        if (Character.isDigit(tokens.peek())) {
+        if (tokens.peek().length() == 1 && Character.isDigit(tokens.peek().charAt(0))) {
             final int radix = 10;
-            return (long) Character.digit(tokens.pop(), radix);
+            return (long) Character.digit(tokens.pop().charAt(0), radix);
+        } else if (tokens.peek().length() == 1 && Character.isLetter(tokens.peek().charAt(0))) {
+            return (long) tokens.pop().charAt(0);
         } else {
-            return (long) tokens.pop();
+            return Long.parseLong(tokens.pop());
         }
     }
 }

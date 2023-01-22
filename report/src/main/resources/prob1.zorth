@@ -1,0 +1,13 @@
+: init variable d variable n ;
+: sumn d @ n @ d @ / DUP 1 + * * 2 / ;
+init
+IN DEC n !
+3 d !
+sumn
+5 d !
+sumn
++
+3 5 * d !
+sumn
+-
+.

@@ -1,6 +1,7 @@
 package ru.itmo.zavar.comp;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.json.simple.JSONArray;
 import ru.itmo.zavar.alu.Alu;
 import ru.itmo.zavar.alu.AluOperation;
 import ru.itmo.zavar.base.mem.DataMemoryController;
@@ -16,6 +17,7 @@ import ru.itmo.zavar.io.InputDevice;
 import ru.itmo.zavar.io.OutputDevice;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.Stack;
 
 @SuppressFBWarnings("EI_EXPOSE_REP2")
@@ -33,18 +35,21 @@ public final class DataPath {
     private boolean negativeFlag;
     private boolean zeroFlag;
     private final StringBuilder outputBuilder;
-    private final Stack<Character> inputCharacters;
+    private final Stack<String> inputTokens;
 
     public DataPath(final ArrayList<Long> data, final Register<Integer> ipRegister, final Register<Integer> arRegister, final Integer inputAddress,
-                    final Integer byteAddress, final Integer charAddress, final Integer memorySize, final Byte bits, final String input) {
+                    final Integer byteAddress, final Integer charAddress, final Integer memorySize, final Byte bits, final JSONArray input) {
         ip = ipRegister;
         ar = arRegister;
         Memory dataMemory = new Memory(memorySize, bits, data);
         tos.writeValue(0L);
-        inputCharacters = new Stack<>();
-        new StringBuilder(input).reverse().toString().chars().forEach(s -> inputCharacters.push((char) s));
+        inputTokens = new Stack<>();
+        ListIterator<String> listIterator = input.listIterator(input.size());
+        while (listIterator.hasPrevious()) {
+            inputTokens.push(listIterator.previous());
+        }
         outputBuilder = new StringBuilder();
-        dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress, inputCharacters),
+        dataMemoryController = new DataMemoryController(dataMemory, new InputDevice(inputAddress, inputTokens),
                 new OutputDevice(byteAddress, charAddress, outputBuilder));
     }
 
@@ -198,10 +203,10 @@ public final class DataPath {
     }
 
     public String getInputToken() {
-        if (inputCharacters.empty()) {
+        if (inputTokens.empty()) {
             return null;
         } else {
-            return String.valueOf(inputCharacters.peek());
+            return String.valueOf(inputTokens.peek());
         }
     }
 

@@ -1,6 +1,7 @@
 package ru.itmo.zavar.comp;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.json.simple.JSONArray;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.alu.AluOperation;
 import ru.itmo.zavar.base.mem.ProtectedMemory;
@@ -33,10 +34,10 @@ public final class ControlUnit {
     private final boolean printDebug;
 
     public ControlUnit(final ArrayList<Long> program, final ArrayList<Long> data, final boolean debug) {
-        this(program, data, "", debug);
+        this(program, data, new JSONArray(), debug);
     }
 
-    public ControlUnit(final ArrayList<Long> program, final ArrayList<Long> data, final String input, final boolean debug) {
+    public ControlUnit(final ArrayList<Long> program, final ArrayList<Long> data, final JSONArray input, final boolean debug) {
         final Byte dataBits = 31; // 32 bits, signed
         final Byte programBits = 32; // 32 bits, unsigned
         final Integer programMemorySize = 16777215; // [2^24 - 1; 0]
