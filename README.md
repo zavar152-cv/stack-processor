@@ -173,7 +173,7 @@ Program memory
 
 - ALU
     - Имеет два входа (левый и правый) и один выход. Выбираются через мультиплексоры и соотв. сигналы
-    - Поддерживает множество операций ([Alu.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/alu/Alu.java)), которые выбираются с помощью сигнала
+    - Поддерживает множество операций ([Alu.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/alu/Alu.java)), которые выбираются с помощью сигнала [AluOperation.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/alu/AluOperation.java)
 - Data stack
     - Можно положить на стек или снять с него значение
     - Регистр DS (32 бита) содержит второй сверху элемент
@@ -181,13 +181,13 @@ Program memory
 - Return stack
     - Можно положить на стек или снять с него значение
     - Регистр RS (32 бита) содержит вершину стека
-- Data memory
-    - Можно записать или считать значение по адресу
+- Data memory 
+    - Можно записать или считать значение по адресу [Memory.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/base/mem/Memory.java)
     - Регистр DMAR (24 бита) отображает адрес
     - Первые три ячейки отведены для IO (0 - байтовый вывод, 1 - ввод, 2 - символьный вывод)
     - Определением с чем работать - с IO или памятью - занимается контроллер памяти ([DataMemoryController.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/base/mem/DataMemoryController.java))
 - Program memory
-    - Можно считывать команды по адресу (read-only)
+    - Можно считывать команды по адресу (read-only) [ProtectedMemory.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/base/mem/ProtectedMemory.java)
     - Регистр PMAR (24 бита) отображает адрес
     - PMAR связан с регистром IP (24 бита)
     - Значение команды попадает сразу в регистр CR (32 бита)
@@ -382,9 +382,23 @@ SUB
 
 Реализовано здесь: [ControlUnit.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/comp/ControlUnit.java)
 
-Составные компоненты описаны выше. Цикл выполнения команды описан выше. Класс предоставляет доступ к журналу моделирования, где можно посмотреть программно каждый тик и состояние каждого регистра и т.д.
+- Hardwired, реализовано полностью на Java 17 (использованы новые возможности выпущенные после 8 версии)
+- Моделирование на уровне тиков
+- Составные компоненты описаны выше 
+- Цикл выполнения команды описан выше
+- Класс предоставляет доступ к журналу моделирования (можно отключить), где можно посмотреть программно каждый тик и состояние каждого регистра в этот тик и т.д.
+- Моделирование может быть остановлено при выбрасывании исключений: [exception](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/tree/master/processor/src/main/java/ru/itmo/zavar/exception)
+    - OutOfInputException - токены на входе закончились
+    - RsEmpty - RS стек пуст
+    - DsEmpty - DS стек пуст
+    - InvalidInstructionException - невалидный код инструкции
+    - ReservedInstructionException - получен код зарезервированной инструкции
+    - MemoryCellConstraintException - превышен лимит ячейки памяти
+    - RegisterConstraintException - превышен лимит значения регистра
+    - InvalidMuxSelectionException - не соотв. желаемый и выбранный вход/вызод (служебное исключение, защита от дурака)
+- Моделирование останавливается после инструкции HALT
 
-Сигналы (выполняются за один такт):
+Сигналы (выполняются за один тик):
 - С префиксом wr - сигнал на запись для соотв. памяти или регистра
 - С префиксом rd - сигнал на чтение соотв. регистра
 - fetch - считать из программной памяти и поместить в CR
@@ -432,7 +446,7 @@ Parent Maven config: [parent pom.xml](https://gitlab.se.ifmo.ru/Zavar30/stack-pr
 
 Docker образ для запуска java и maven: [Dockerfile](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/Dockerfile)
 
-### **Пример работы с car.zorth**
+### **Пример работы с cat.zorth**
 
 ```
 > cd translator/target/
