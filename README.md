@@ -173,7 +173,7 @@ Program memory
 
 - ALU
     - Имеет два входа (левый и правый) и один выход. Выбираются через мультиплексоры и соотв. сигналы
-    - Поддерживает множество операций ([Alu.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/alu/Alu.java)), которые выбираются с помощью сигнала [AluOperation.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/alu/AluOperation.java)
+    - Поддерживает множество операций ([Alu.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/alu/Alu.java)), которые выбираются с помощью сигнала ([AluOperation.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/alu/AluOperation.java))
 - Data stack
     - Можно положить на стек или снять с него значение
     - Регистр DS (32 бита) содержит второй сверху элемент
@@ -182,12 +182,12 @@ Program memory
     - Можно положить на стек или снять с него значение
     - Регистр RS (32 бита) содержит вершину стека
 - Data memory 
-    - Можно записать или считать значение по адресу [Memory.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/base/mem/Memory.java)
+    - Можно записать или считать значение по адресу ([Memory.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/base/mem/Memory.java))
     - Регистр DMAR (24 бита) отображает адрес
     - Первые три ячейки отведены для IO (0 - байтовый вывод, 1 - ввод, 2 - символьный вывод)
     - Определением с чем работать - с IO или памятью - занимается контроллер памяти ([DataMemoryController.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/base/mem/DataMemoryController.java))
 - Program memory
-    - Можно считывать команды по адресу (read-only) [ProtectedMemory.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/base/mem/ProtectedMemory.java)
+    - Можно считывать команды по адресу (read-only) ([ProtectedMemory.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/base/mem/ProtectedMemory.java))
     - Регистр PMAR (24 бита) отображает адрес
     - PMAR связан с регистром IP (24 бита)
     - Значение команды попадает сразу в регистр CR (32 бита)
@@ -211,13 +211,13 @@ Program memory
 
 ### **Цикл выполнения инструкции**
 Цикл состоит из трёх этапов:
-- Fetch next instruction (загрузка следующей инструкции)
+- [Fetch next instruction](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/comp/ControlUnit.java#L147) (загрузка следующей инструкции)
     - PMAR ← IP
     - СR ← PMEMORY
     - IP ← IP + 1
-- Fetch address (загрузка адреса из кода инструкции в AR, если инструкция адресная)
+- [Fetch address](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/comp/ControlUnit.java#L136) (загрузка адреса из кода инструкции в AR, если инструкция адресная)
     - AR ← CR (0..23)
-- Execute (выполнение)
+- [Execute](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/comp/ControlUnit.java#L156) (выполнение)
     - Такты самой инструкции
 
 ### **Кодирование инструкций**
