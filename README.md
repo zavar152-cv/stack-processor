@@ -258,7 +258,7 @@ Program memory
 | NOPE | 00110100 | 1 | Нет операции |
 | EXIT | 00110110 | 1 | см. язык |
 | NOT | 00111000 | 1 | см. язык |
-| [ADDR] addr | 00111011 | 2 | Загрузить адрес в AR |
+| [ADDR] addr | 00111011 | 2 | Загрузить адрес из AR в TOS |
 | INC | 00111100 | 1 | см. язык |
 | DEC | 00111110 | 1 | см. язык |
 | NEQ | 01000000 | 1 | см. язык |
@@ -337,3 +337,51 @@ SUB
 - Для условий if$n - n - адрес в памяти программы на который нужно прыгнуть в случае 0 на вершине
 
 Итоговая программа может быть упакована в бинарный формат или текстовый формат с мнемониками.
+
+## **Модель процессора**
+### **DataPath**
+<img src="img/DataPath.png" alt="dataPath"/>
+
+Реализовано здесь: [DataPath.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/comp/DataPath.java)
+
+Составные компоненты описаны выше.
+
+Сигналы (выполняются за один такт):
+- С префиксом oe - сигнал output enable для соотв. памяти
+- С префиксом wr - сигнал на запись для соотв. памяти или регистра
+- С префиксом rd - сигнал на чтение соотв. регистра
+- sel-lalu - выбор левого входа ALU
+- sel-ralu - выбор правого входа ALU
+- sel-out - выбор выхода ALU
+- sel-op - выбор операции ALU
+
+Сигналы реализованы с помощью методов в классе [DataPath.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/comp/DataPath.java). Мультиплексоры реализованы с помощью enum здесь [mux](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/tree/master/processor/src/main/java/ru/itmo/zavar/base/mux).
+
+Флаги:
+- Z - проверить TOS на 0
+- N - знак TOS 
+
+
+### **ControlUnit**
+<img src="img/ControlUnit.png" alt="controlUnit"/>
+
+Реализовано здесь: [ControlUnit.java](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/processor/src/main/java/ru/itmo/zavar/comp/ControlUnit.java)
+
+Составные компоненты описаны выше. Цикл выполнения команды описан выше. Класс предоставляет доступ к журналу моделирования, где можно посмотреть программно каждый тик и состояние каждого регистра и т.д.
+
+Сигналы (выполняются за один такт):
+- С префиксом wr - сигнал на запись для соотв. памяти или регистра
+- С префиксом rd - сигнал на чтение соотв. регистра
+- fetch - считать из программной памяти и поместить в CR
+- fetch-ar - поместить из CR в AR адрес
+- inc-tick - инкрементировать TC
+- reset-tick - сбросить TC
+
+### **Интерфейс командной строки**
+```
+usage: processor.jar
+ -d,--data <arg>      data path
+ -dg,--debug <arg>    debug
+ -i,--input <arg>     input path
+ -p,--program <arg>   program path
+```
