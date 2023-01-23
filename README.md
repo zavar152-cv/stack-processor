@@ -286,7 +286,7 @@ usage: translator.jar
     - Установка заглущек с метками на адресные команды
     - Разделение кода функций и основной программы
     - Проверка синтаксических ошибок и вывод сообщений о них
-2. Трансляция
+2. Линковка
     - Установка адресов в таблицах линковки
     - Размещение в памяти литералов и переменных
     - Установка валидных адресов вместо заглушек в основной программе
@@ -429,7 +429,7 @@ Parent Maven config: [parent pom.xml](https://gitlab.se.ifmo.ru/Zavar30/stack-pr
 
 Все плагины подключен и настроены в pom.xml (Maven config), GitLab CI осуществляет только запуск и вывод информации.
 
-Docker образ для запуска java и maven: //TODO
+Docker образ для запуска java и maven: [Dockerfile](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/Dockerfile)
 
 ### **Пример работы с car.zorth**
 
@@ -677,3 +677,8 @@ Input device with address 1 is out of tokens
 Output from processor: foo\n
 ```
 
+| ФИО | алг. | LoC | code байт | code инстр. | инстр. | такт. | вариант |
+|-----|------|-----|-----------|-------------|--------|-------|---------|
+| Абузов Ярослав Александрович | hello |  1  |  148      |             |  37    |  232  | `forth | stack | harv | hw | tick | binary | stream | mem | prob1`        |
+| Абузов Ярослав Александрович | cat   |  5  |  28       |             |  27    |  161  | `forth | stack | harv | hw | tick | binary | stream | mem | prob1`        |
+| Абузов Ярослав Александрович | prob1 | 13  |  164      |             |  41    |  372  |  `forth | stack | harv | hw | tick | binary | stream | mem | prob1`       |
