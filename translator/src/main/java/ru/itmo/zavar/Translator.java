@@ -5,12 +5,13 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.cli.*;
 import ru.itmo.zavar.zorth.ZorthTranslator;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Translator {
     private static ZorthTranslator zorthTranslator;
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws IOException {
         Options options = new Options();
 
         Option input = new Option("i", "input", true, "input file path");
@@ -49,14 +50,9 @@ public final class Translator {
         boolean debug = Boolean.parseBoolean(cmd.getOptionValue("debug"));
 
         zorthTranslator = new ZorthTranslator(Path.of(inputFilePath), Path.of(outputFilePath), outputFormat.equals("bin"));
-        try {
-            zorthTranslator.compile(debug);
-            zorthTranslator.linkage(debug);
-            zorthTranslator.saveProgramAndData();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        zorthTranslator.compile(debug);
+        zorthTranslator.linkage(debug);
+        zorthTranslator.saveProgramAndData();
     }
 
     public static ZorthTranslator getZorthTranslator() {

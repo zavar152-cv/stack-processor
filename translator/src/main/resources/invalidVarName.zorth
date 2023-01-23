@@ -1,0 +1,2 @@
+: buzz 2 + ;
+variable buzz

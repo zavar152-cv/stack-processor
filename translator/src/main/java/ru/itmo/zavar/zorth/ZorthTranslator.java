@@ -246,30 +246,25 @@ public class ZorthTranslator {
         }
     }
 
-    // TODO errors
     private void parseFunction(final ListIterator<String> listIterator) {
-        try {
-            listIterator.next(); //skip :
-            String name = listIterator.next();
-            if (!name.matches("([A-Z]|[a-z]|[0-9])+")) {
-                throw new InvalidFunctionNameException("Invalid function name at " + (listIterator.previousIndex() + 1));
-            }
-            ArrayList<String> funcTokens = new ArrayList<>();
-            String t = listIterator.next();
-            try {
-                while (!t.equals(";")) {
-                    funcTokens.add(t);
-                    t = listIterator.next();
-                }
-            } catch (NoSuchElementException e) {
-                throw new NoSuchElementException("Missing \";\" at " + (listIterator.previousIndex() + 1));
-            }
-            int c = parseWords(funcTokens.listIterator()) + 1;
-            functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.EXIT, ""));
-            functionAddressTable.put(new AbstractMap.SimpleEntry<>(name, c), 0);
-        } catch (Exception e) {
-            throw new IllegalArgumentException((e.getMessage() != null ? e.getMessage() : ""));
+        listIterator.next(); //skip :
+        String name = listIterator.next();
+        if (!name.matches("([A-Z]|[a-z]|[0-9])+")) {
+            throw new InvalidFunctionNameException("Invalid function name at " + (listIterator.previousIndex() + 1));
         }
+        ArrayList<String> funcTokens = new ArrayList<>();
+        String t = listIterator.next();
+        try {
+            while (!t.equals(";")) {
+                funcTokens.add(t);
+                t = listIterator.next();
+            }
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException("Missing \";\" at " + (listIterator.previousIndex() + 1));
+        }
+        int c = parseWords(funcTokens.listIterator()) + 1;
+        functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.EXIT, ""));
+        functionAddressTable.put(new AbstractMap.SimpleEntry<>(name, c), 0);
     }
 
     private int parseWords(final ListIterator<String> listIterator) {
@@ -409,8 +404,8 @@ public class ZorthTranslator {
                     endifCount++;
                 }
             }
-        } catch (NoSuchElementException e) { //TODO add error
-            throw new NoSuchElementException("Missing \"endif\" at " + (listIterator.previousIndex() + 1)); //TODO fix position
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException("Missing \"endif\" at " + (listIterator.previousIndex() + 1));
         }
         if (isFunction) {
             functionsProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.IF, "if$"));
@@ -443,8 +438,8 @@ public class ZorthTranslator {
                     doCount++;
                 }
             }
-        } catch (NoSuchElementException e) { //TODO add error
-            throw new NoSuchElementException("Missing \"loop\" at " + (listIterator.previousIndex() + 1)); //TODO fix position
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException("Missing \"loop\" at " + (listIterator.previousIndex() + 1));
         }
         int count = parseWords(loopTokens.listIterator());
         if (isFunction) {
