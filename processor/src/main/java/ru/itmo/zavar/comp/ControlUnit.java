@@ -175,7 +175,7 @@ public final class ControlUnit {
                 dataPath.selectOut(AluOutputMux.TO_TOS);
                 dataPath.readDs();
                 dataPath.readTos();
-                dataPath.selectOp(AluOperation.MINUS); // TOS ← TOS - POP(DS)
+                dataPath.selectOp(AluOperation.MINUS); // TOS ← POP(DS) - TOS
                 dataPath.writeTos();
                 incTick();
             }
@@ -195,7 +195,7 @@ public final class ControlUnit {
                 dataPath.selectOut(AluOutputMux.TO_TOS);
                 dataPath.readDs();
                 dataPath.readTos();
-                dataPath.selectOp(AluOperation.DIVIDE); // TOS ← TOS / POP(DS)
+                dataPath.selectOp(AluOperation.DIVIDE); // TOS ← POP(DS) / TOS
                 dataPath.writeTos();
                 incTick();
             }
