@@ -15,19 +15,20 @@
 
 ```
 <base> ::= <words> | <function> <space> <base>
-<word> ::= <number> | <command>
+<word> ::= <number> | <command> | <comment>
 <words> ::= <word> <space> <words> | <loop> <space> <words> | <word>
 <number> ::= [0-9]+
-<command> ::= "+" | "-" | "*" | "/" | INC | DEC | "AND" | "OR" | "NEG" | "XOR" | "NOT" | "=" 
+<command> ::= "+" | "-" | "*" | "/" | "INC" | "DEC" | "AND" | "OR" | "NEG" | "XOR" | "NOT" | "=" 
                   | "!=" | ">" | "<" | "SWAP" | "DROP" | "DUP" | "OVER" | "!" | "@" | "." 
                   | "EMIT" | "IN" | <var> | <name> | ".\"" <space> <string> | <if>
 <function> ::= ":" <space> <name> <space> <words> <space> ";"
 <loop> ::= "do" <space> <words> <space> "loop"
 <if> ::= "if" <space> <words> <space> "endif"
 <var> ::= "variable" <space> <name>
-<string> ::= ([A-z] | [0-9])+ "\""
+<string> ::= ([A-z] | [0-9] | " ")+ "\""
 <name> ::= ([A-Z] | [a-z])+
 <space> ::= " " | "\n"
+<comment> ::= "//" ([A-z] | [0-9] | " ")+
 ```
 
 - Основное свойство языка - запись всех действий в обратной польской нотации (т.е. 2 + 3 будет выглядеть так: 2 3 +). Основной объект действия команд - стек
