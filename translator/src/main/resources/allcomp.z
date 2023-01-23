@@ -1,0 +1,116 @@
+[LIT] 8
+[LIT] 4
+ADD
+[LIT] 9
+[LIT] 8
+SUB
+[LIT] 11
+[LIT] 7
+MUL
+[CALL] 89
+[ADDR] 21
+@
+[LIT] 7
+[ADDR] 21
+!
+DIV
+NOT
+LE
+GR
+DROP
+DUP
+OVER
+[ADDR] 0
+!
+INC
+DEC
+NEQ
+[ADDR] 1
+@
+SWAP
+[CALL] 105
+[LIT] 16
+[LIT] 14
+[LIT] 5
+[ADDR] 2
+!
+[ADDR] 21
+[LOOP] 33
+ADD
+[LOOP] 31
+AND
+[IF] 49
+[LIT] 9
+[LIT] 4
+AND
+[IF] 48
+OR
+MUL
+EQ
+SUB
+ADD
+[LIT] 16
+[LIT] 15
+[ADDR] 2
+!
+[LIT] 12
+[ADDR] 2
+!
+[LIT] 17
+[ADDR] 2
+!
+[LIT] 17
+[ADDR] 2
+!
+[LIT] 18
+[ADDR] 2
+!
+[LIT] 3
+[ADDR] 2
+!
+[LIT] 20
+[ADDR] 2
+!
+[LIT] 18
+[ADDR] 2
+!
+[LIT] 19
+[ADDR] 2
+!
+[LIT] 17
+[ADDR] 2
+!
+[LIT] 10
+[ADDR] 2
+!
+[LIT] 6
+[ADDR] 2
+!
+HALT
+[LIT] 11
+[LIT] 11
+AND
+[LIT] 4
+EQ
+EXIT
+[LIT] 8
+[LIT] 13
+AND
+OR
+[LOOP] 98
+[LOOP] 97
+NEG
+[LIT] 4
+EQ
+EXIT
+[LIT] 9
+[LIT] 4
+[IF] 115
+AND
+[IF] 113
+OR
+EQ
+[LIT] 4
+XOR
+EQ
+EXIT

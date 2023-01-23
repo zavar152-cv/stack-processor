@@ -468,7 +468,7 @@ public final class ControlUnit {
                 dataPath.selectLalu(LeftAluInputMux.FROM_AR);
                 dataPath.selectOut(AluOutputMux.TO_TOS);
                 dataPath.readAr();
-                dataPath.selectOp(AluOperation.LEFT); // IP ← AR
+                dataPath.selectOp(AluOperation.LEFT); // TOS ← AR
                 dataPath.writeTos();
                 incTick();
             }
