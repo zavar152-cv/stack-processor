@@ -292,7 +292,18 @@ usage: translator.jar
     - Установка валидных адресов вместо заглушек в основной программе
     - Соединение основной программы и функций
 
-Пример скомпилированной части программы:
+Часть программы prob1:
+```
+sumn
+5 d !
+sumn
++
+3 5 * d !
+sumn
+-
+```
+
+Пример скомпилированной части программы (в мнемониках):
 ```
 [CALL] fun$sumn
 [LIT] lit$5
@@ -327,16 +338,19 @@ SUB
 ```
 ### **Правила трансляции**
 
-- Примитивы Zorth могут быть отражены в команды процессора 1:1 (например, '+', '-', 'AND') или 1:N ('.', 'EMIT').
+- Примитивы Zorth могут быть отражены в команды процессора напрямую (например, '+', '-', 'AND') или последоватльностью из несольких команд ('.', 'EMIT').
 - В конце основной программы HALT
 - В конце функций EXIT
-- Для загрузки литерала lit$n - n - адрес литерала в памяти данных
-- Для переменной var$n - n - адрес переменной в памяти данных
-- Для функции fun$n - n - адрес прыжка в памяти программы
-- Для цикла loop$n - n - насколько шагов назад необходимо прыгуть относительно [LOOP] в памяти программы т.е. адрес будет равен адрес ([LOOP] - n)
-- Для условий if$n - n - адрес в памяти программы на который нужно прыгнуть в случае 0 на вершине
+- Каждый символ строкового литерала упаковывается в отдельную ячейку как числовой литерал
+- Для загрузки литерала lit$n: n - адрес литерала в памяти данных
+- Для переменной var$n: n - адрес переменной в памяти данных
+- Для функции fun$n: n - адрес прыжка в памяти программы
+- Для цикла loop$n: n - на сколько шагов назад необходимо прыгуть относительно [LOOP] в памяти программы т.е. адрес будет равен адрес ([LOOP] - n)
+- Для условий if$n: n - адрес в памяти программы на который нужно прыгнуть в случае 0 на вершине
 
 Итоговая программа может быть упакована в бинарный формат или текстовый формат с мнемониками.
+
+Примеры программ: [resources](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/tree/master/report/src/main/resources)
 
 ## **Модель процессора**
 ### **DataPath**
@@ -385,3 +399,281 @@ usage: processor.jar
  -i,--input <arg>     input path
  -p,--program <arg>   program path
 ```
+
+## **Апробация**
+
+- Пачка тестов для проверки всех инструкция процессора, ограничений памяти и исключений: [processor tests](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/tree/master/processor/src/test/java/ru/itmo/zavar)
+- Тесты для транслятора: [translator tests](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/tree/master/translator/src/test/java)
+- Интеграционные тесты (hello, cat, prob1): [integration tests](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/tree/master/report/src/test/java/ru/itmo/zavar/integration)
+
+### **Программы для тестирования**
+
+1. [hello.zorth](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/report/src/main/resources/hello.zorth) - выводит Hello world!
+2. [cat.zorth](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/report/src/main/resources/cat.zorth) - программа cat (повторяет ввод на выводе)
+3. [prob1.zorth](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/report/src/main/resources/prob1.zorth) - Euler problem 1
+
+### **Описание CI**
+
+GitLab CI config: [.gitlab-ci.yml](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/.gitlab-ci.yml)
+
+Parent Maven config: [parent pom.xml](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/blob/master/pom.xml)
+
+- JUnit - фреймворк для тестирования
+- Jacoco - maven плагин для подсчёта покрытия кода тестами (результат в шапке)
+- Checkstyle - maven плагин для проверки стиля кода
+- Spotbugs - maven плагин для проверки качества кода
+
+Для запуска тестов, подсчёта покрытия и проверки стиля необходимо запустить: `mvn verify`
+
+Для проверки качества кода необходимо запустить: `mvn spotbugs:check`
+
+Все плагины подключен и настроены в pom.xml (Maven config), GitLab CI осуществляет только запуск и вывод информации.
+
+Docker образ для запуска java и maven: //TODO
+
+### **Пример работы с car.zorth**
+
+```
+> cd translator/target/
+> cat ./cat.zorth
+do
+1
+IN
+EMIT
+loop
+> java -jar translator.jar -d true -f mne -i ./cat.zorth -o ./cat/output
+COMPILATION:
+
+Compiled main:
+[LIT] lit$1
+[ADDR] 1
+@ 
+[ADDR] 2
+! 
+[LOOP] loop$5
+HALT 
+Compiled functions:
+
+Function table:
+
+Literal table:
+1, address:0
+
+Var table:
+
+LINKAGE:
+
+
+Function table:
+
+Literal table:
+1, address:3
+
+Var table:
+
+Program:
+[LIT] 3
+[ADDR] 1
+@ 
+[ADDR] 2
+! 
+[LOOP] 0
+HALT 
+> java -jar translator.jar -d false -f bin -i ./cat.zorth -o ./cat/output
+> cd processor/target/
+> cat ./input
+{
+    "tokens": ["f", "o", "o", "\n"]
+}
+> java -jar processor.jar -db true -p ./compiled.bin -d ./data.dbin -i ./input
+Tick: 1, TC: 1, Stage: FETCH, CR: 872415232 {NOPE}, IP: 0, AR: 0, TOS: 0, DS: null, RS: null, OUT: null, IN: f
+Tick: 2, TC: 2, Stage: FETCH, CR: 721420291 {LIT}, IP: 0, AR: 0, TOS: 0, DS: null, RS: null, OUT: null, IN: f
+Tick: 3, TC: 3, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 0, TOS: 0, DS: null, RS: null, OUT: null, IN: f
+Tick: 4, TC: 1, Stage: ADDRESS, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: null, RS: null, OUT: null, IN: f
+Tick: 5, TC: 1, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: null, RS: null, OUT: null, IN: f
+Tick: 6, TC: 2, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: null, IN: f
+Tick: 7, TC: 3, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: null, IN: f
+
+Tick: 8, TC: 1, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: null, IN: f
+Tick: 9, TC: 2, Stage: FETCH, CR: 989855745 {ADDR}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: null, IN: f
+Tick: 10, TC: 3, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 3, TOS: 1, DS: 0, RS: null, OUT: null, IN: f
+Tick: 11, TC: 1, Stage: ADDRESS, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 0, RS: null, OUT: null, IN: f
+Tick: 12, TC: 1, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: null, IN: f
+Tick: 13, TC: 2, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: null, IN: f
+
+Tick: 14, TC: 1, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: null, IN: f
+Tick: 15, TC: 2, Stage: FETCH, CR: 671088640 {FT}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: null, IN: f
+Tick: 16, TC: 3, Stage: FETCH, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: null, IN: f
+Tick: 17, TC: 1, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: null, IN: f
+Tick: 18, TC: 2, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 102, DS: 1, RS: null, OUT: null, IN: o
+
+Tick: 19, TC: 1, Stage: FETCH, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 102, DS: 1, RS: null, OUT: null, IN: o
+Tick: 20, TC: 2, Stage: FETCH, CR: 989855746 {ADDR}, IP: 3, AR: 1, TOS: 102, DS: 1, RS: null, OUT: null, IN: o
+Tick: 21, TC: 3, Stage: FETCH, CR: 989855746 {ADDR}, IP: 4, AR: 1, TOS: 102, DS: 1, RS: null, OUT: null, IN: o
+Tick: 22, TC: 1, Stage: ADDRESS, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 102, DS: 1, RS: null, OUT: null, IN: o
+Tick: 23, TC: 1, Stage: EXECUTE, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 102, DS: 102, RS: null, OUT: null, IN: o
+Tick: 24, TC: 2, Stage: EXECUTE, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 2, DS: 102, RS: null, OUT: null, IN: o
+
+Tick: 25, TC: 1, Stage: FETCH, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 2, DS: 102, RS: null, OUT: null, IN: o
+Tick: 26, TC: 2, Stage: FETCH, CR: 637534208 {ST}, IP: 4, AR: 2, TOS: 2, DS: 102, RS: null, OUT: null, IN: o
+Tick: 27, TC: 3, Stage: FETCH, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 102, RS: null, OUT: null, IN: o
+Tick: 28, TC: 1, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 102, RS: null, OUT: null, IN: o
+Tick: 29, TC: 2, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 1, RS: null, OUT: f, IN: o
+Tick: 30, TC: 3, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+
+Tick: 31, TC: 1, Stage: FETCH, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+Tick: 32, TC: 2, Stage: FETCH, CR: 855638016 {LOOP}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+Tick: 33, TC: 3, Stage: FETCH, CR: 855638016 {LOOP}, IP: 6, AR: 2, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+Tick: 34, TC: 1, Stage: ADDRESS, CR: 855638016 {LOOP}, IP: 6, AR: 0, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+Tick: 35, TC: 1, Stage: EXECUTE, CR: 855638016 {LOOP}, IP: 6, AR: 0, TOS: 0, DS: 0, RS: null, OUT: f, IN: o
+Tick: 36, TC: 2, Stage: EXECUTE, CR: 855638016 {LOOP}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: f, IN: o
+
+Tick: 37, TC: 1, Stage: FETCH, CR: 855638016 {LOOP}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: f, IN: o
+Tick: 38, TC: 2, Stage: FETCH, CR: 721420291 {LIT}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: f, IN: o
+Tick: 39, TC: 3, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 0, TOS: 0, DS: 0, RS: null, OUT: f, IN: o
+Tick: 40, TC: 1, Stage: ADDRESS, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: f, IN: o
+Tick: 41, TC: 1, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: f, IN: o
+Tick: 42, TC: 2, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: f, IN: o
+Tick: 43, TC: 3, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+
+Tick: 44, TC: 1, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+Tick: 45, TC: 2, Stage: FETCH, CR: 989855745 {ADDR}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+Tick: 46, TC: 3, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 3, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+Tick: 47, TC: 1, Stage: ADDRESS, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 0, RS: null, OUT: f, IN: o
+Tick: 48, TC: 1, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: f, IN: o
+Tick: 49, TC: 2, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: f, IN: o
+
+Tick: 50, TC: 1, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: f, IN: o
+Tick: 51, TC: 2, Stage: FETCH, CR: 671088640 {FT}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: f, IN: o
+Tick: 52, TC: 3, Stage: FETCH, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: f, IN: o
+Tick: 53, TC: 1, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: f, IN: o
+Tick: 54, TC: 2, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 111, DS: 1, RS: null, OUT: f, IN: o
+
+Tick: 55, TC: 1, Stage: FETCH, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 111, DS: 1, RS: null, OUT: f, IN: o
+Tick: 56, TC: 2, Stage: FETCH, CR: 989855746 {ADDR}, IP: 3, AR: 1, TOS: 111, DS: 1, RS: null, OUT: f, IN: o
+Tick: 57, TC: 3, Stage: FETCH, CR: 989855746 {ADDR}, IP: 4, AR: 1, TOS: 111, DS: 1, RS: null, OUT: f, IN: o
+Tick: 58, TC: 1, Stage: ADDRESS, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 111, DS: 1, RS: null, OUT: f, IN: o
+Tick: 59, TC: 1, Stage: EXECUTE, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 111, DS: 111, RS: null, OUT: f, IN: o
+Tick: 60, TC: 2, Stage: EXECUTE, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 2, DS: 111, RS: null, OUT: f, IN: o
+
+Tick: 61, TC: 1, Stage: FETCH, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 2, DS: 111, RS: null, OUT: f, IN: o
+Tick: 62, TC: 2, Stage: FETCH, CR: 637534208 {ST}, IP: 4, AR: 2, TOS: 2, DS: 111, RS: null, OUT: f, IN: o
+Tick: 63, TC: 3, Stage: FETCH, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 111, RS: null, OUT: f, IN: o
+Tick: 64, TC: 1, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 111, RS: null, OUT: f, IN: o
+Tick: 65, TC: 2, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 1, RS: null, OUT: fo, IN: o
+Tick: 66, TC: 3, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+
+Tick: 67, TC: 1, Stage: FETCH, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 68, TC: 2, Stage: FETCH, CR: 855638016 {LOOP}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 69, TC: 3, Stage: FETCH, CR: 855638016 {LOOP}, IP: 6, AR: 2, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 70, TC: 1, Stage: ADDRESS, CR: 855638016 {LOOP}, IP: 6, AR: 0, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 71, TC: 1, Stage: EXECUTE, CR: 855638016 {LOOP}, IP: 6, AR: 0, TOS: 0, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 72, TC: 2, Stage: EXECUTE, CR: 855638016 {LOOP}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: fo, IN: o
+
+Tick: 73, TC: 1, Stage: FETCH, CR: 855638016 {LOOP}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 74, TC: 2, Stage: FETCH, CR: 721420291 {LIT}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 75, TC: 3, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 0, TOS: 0, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 76, TC: 1, Stage: ADDRESS, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 77, TC: 1, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 78, TC: 2, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 79, TC: 3, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+
+Tick: 80, TC: 1, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 81, TC: 2, Stage: FETCH, CR: 989855745 {ADDR}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 82, TC: 3, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 3, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 83, TC: 1, Stage: ADDRESS, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 0, RS: null, OUT: fo, IN: o
+Tick: 84, TC: 1, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: fo, IN: o
+Tick: 85, TC: 2, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: fo, IN: o
+
+Tick: 86, TC: 1, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: fo, IN: o
+Tick: 87, TC: 2, Stage: FETCH, CR: 671088640 {FT}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: fo, IN: o
+Tick: 88, TC: 3, Stage: FETCH, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: fo, IN: o
+Tick: 89, TC: 1, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: fo, IN: o
+Tick: 90, TC: 2, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 111, DS: 1, RS: null, OUT: fo, IN: \n
+
+Tick: 91, TC: 1, Stage: FETCH, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 111, DS: 1, RS: null, OUT: fo, IN: \n
+Tick: 92, TC: 2, Stage: FETCH, CR: 989855746 {ADDR}, IP: 3, AR: 1, TOS: 111, DS: 1, RS: null, OUT: fo, IN: \n
+Tick: 93, TC: 3, Stage: FETCH, CR: 989855746 {ADDR}, IP: 4, AR: 1, TOS: 111, DS: 1, RS: null, OUT: fo, IN: \n
+Tick: 94, TC: 1, Stage: ADDRESS, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 111, DS: 1, RS: null, OUT: fo, IN: \n
+Tick: 95, TC: 1, Stage: EXECUTE, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 111, DS: 111, RS: null, OUT: fo, IN: \n
+Tick: 96, TC: 2, Stage: EXECUTE, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 2, DS: 111, RS: null, OUT: fo, IN: \n
+
+Tick: 97, TC: 1, Stage: FETCH, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 2, DS: 111, RS: null, OUT: fo, IN: \n
+Tick: 98, TC: 2, Stage: FETCH, CR: 637534208 {ST}, IP: 4, AR: 2, TOS: 2, DS: 111, RS: null, OUT: fo, IN: \n
+Tick: 99, TC: 3, Stage: FETCH, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 111, RS: null, OUT: fo, IN: \n
+Tick: 100, TC: 1, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 111, RS: null, OUT: fo, IN: \n
+Tick: 101, TC: 2, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 1, RS: null, OUT: foo, IN: \n
+Tick: 102, TC: 3, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+
+Tick: 103, TC: 1, Stage: FETCH, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 104, TC: 2, Stage: FETCH, CR: 855638016 {LOOP}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 105, TC: 3, Stage: FETCH, CR: 855638016 {LOOP}, IP: 6, AR: 2, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 106, TC: 1, Stage: ADDRESS, CR: 855638016 {LOOP}, IP: 6, AR: 0, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 107, TC: 1, Stage: EXECUTE, CR: 855638016 {LOOP}, IP: 6, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 108, TC: 2, Stage: EXECUTE, CR: 855638016 {LOOP}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo, IN: \n
+
+Tick: 109, TC: 1, Stage: FETCH, CR: 855638016 {LOOP}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 110, TC: 2, Stage: FETCH, CR: 721420291 {LIT}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 111, TC: 3, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 112, TC: 1, Stage: ADDRESS, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 113, TC: 1, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 114, TC: 2, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 115, TC: 3, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+
+Tick: 116, TC: 1, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 117, TC: 2, Stage: FETCH, CR: 989855745 {ADDR}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 118, TC: 3, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 3, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 119, TC: 1, Stage: ADDRESS, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 0, RS: null, OUT: foo, IN: \n
+Tick: 120, TC: 1, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo, IN: \n
+Tick: 121, TC: 2, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo, IN: \n
+
+Tick: 122, TC: 1, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo, IN: \n
+Tick: 123, TC: 2, Stage: FETCH, CR: 671088640 {FT}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo, IN: \n
+Tick: 124, TC: 3, Stage: FETCH, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo, IN: \n
+Tick: 125, TC: 1, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo, IN: \n
+Tick: 126, TC: 2, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 10, DS: 1, RS: null, OUT: foo, IN: null
+
+Tick: 127, TC: 1, Stage: FETCH, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 10, DS: 1, RS: null, OUT: foo, IN: null
+Tick: 128, TC: 2, Stage: FETCH, CR: 989855746 {ADDR}, IP: 3, AR: 1, TOS: 10, DS: 1, RS: null, OUT: foo, IN: null
+Tick: 129, TC: 3, Stage: FETCH, CR: 989855746 {ADDR}, IP: 4, AR: 1, TOS: 10, DS: 1, RS: null, OUT: foo, IN: null
+Tick: 130, TC: 1, Stage: ADDRESS, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 10, DS: 1, RS: null, OUT: foo, IN: null
+Tick: 131, TC: 1, Stage: EXECUTE, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 10, DS: 10, RS: null, OUT: foo, IN: null
+Tick: 132, TC: 2, Stage: EXECUTE, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 2, DS: 10, RS: null, OUT: foo, IN: null
+
+Tick: 133, TC: 1, Stage: FETCH, CR: 989855746 {ADDR}, IP: 4, AR: 2, TOS: 2, DS: 10, RS: null, OUT: foo, IN: null
+Tick: 134, TC: 2, Stage: FETCH, CR: 637534208 {ST}, IP: 4, AR: 2, TOS: 2, DS: 10, RS: null, OUT: foo, IN: null
+Tick: 135, TC: 3, Stage: FETCH, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 10, RS: null, OUT: foo, IN: null
+Tick: 136, TC: 1, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 10, RS: null, OUT: foo, IN: null
+Tick: 137, TC: 2, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 2, DS: 1, RS: null, OUT: foo\n, IN: null
+Tick: 138, TC: 3, Stage: EXECUTE, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+
+Tick: 139, TC: 1, Stage: FETCH, CR: 637534208 {ST}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 140, TC: 2, Stage: FETCH, CR: 855638016 {LOOP}, IP: 5, AR: 2, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 141, TC: 3, Stage: FETCH, CR: 855638016 {LOOP}, IP: 6, AR: 2, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 142, TC: 1, Stage: ADDRESS, CR: 855638016 {LOOP}, IP: 6, AR: 0, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 143, TC: 1, Stage: EXECUTE, CR: 855638016 {LOOP}, IP: 6, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 144, TC: 2, Stage: EXECUTE, CR: 855638016 {LOOP}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo\n, IN: null
+
+Tick: 145, TC: 1, Stage: FETCH, CR: 855638016 {LOOP}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 146, TC: 2, Stage: FETCH, CR: 721420291 {LIT}, IP: 0, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 147, TC: 3, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 0, TOS: 0, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 148, TC: 1, Stage: ADDRESS, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 149, TC: 1, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 150, TC: 2, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 0, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 151, TC: 3, Stage: EXECUTE, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+
+Tick: 152, TC: 1, Stage: FETCH, CR: 721420291 {LIT}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 153, TC: 2, Stage: FETCH, CR: 989855745 {ADDR}, IP: 1, AR: 3, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 154, TC: 3, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 3, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 155, TC: 1, Stage: ADDRESS, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 0, RS: null, OUT: foo\n, IN: null
+Tick: 156, TC: 1, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo\n, IN: null
+Tick: 157, TC: 2, Stage: EXECUTE, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo\n, IN: null
+
+Tick: 158, TC: 1, Stage: FETCH, CR: 989855745 {ADDR}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo\n, IN: null
+Tick: 159, TC: 2, Stage: FETCH, CR: 671088640 {FT}, IP: 2, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo\n, IN: null
+Tick: 160, TC: 3, Stage: FETCH, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo\n, IN: null
+Tick: 161, TC: 1, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 1, RS: null, OUT: foo\n, IN: null
+Input device with address 1 is out of tokens
+Output from processor: foo\n
+```
+
