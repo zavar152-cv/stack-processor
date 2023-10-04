@@ -10,7 +10,6 @@ import ru.itmo.zavar.base.mux.LeftAluInputMux;
 import ru.itmo.zavar.base.mux.RightAluInputMux;
 import ru.itmo.zavar.base.register.Register;
 import ru.itmo.zavar.exception.ControlUnitException;
-import ru.itmo.zavar.exception.InvalidInstructionException;
 import ru.itmo.zavar.exception.ReservedInstructionException;
 import ru.itmo.zavar.log.TickLog;
 
@@ -544,7 +543,7 @@ public final class ControlUnit {
                 dataPath.writeIp();
                 incTick();
             }
-            case null -> throw new InvalidInstructionException("Instruction is null");
+            //case null -> throw new InvalidInstructionException("Instruction is null");
             default -> throw new ReservedInstructionException();
         }
     }

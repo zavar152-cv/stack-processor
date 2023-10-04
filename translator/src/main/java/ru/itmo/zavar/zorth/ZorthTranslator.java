@@ -33,6 +33,8 @@ public class ZorthTranslator {
     private Integer lineNumber = 0;
     private Integer positionInLine = 0;
 
+    private ArrayList<String> debugMessages = new ArrayList<>();
+
     public void compile(final boolean debug) {
         ArrayList<String> tokens = new ArrayList<>();
         try (BufferedReader bufferedReader = Files.newBufferedReader(inputFilePath)) {
@@ -59,8 +61,11 @@ public class ZorthTranslator {
         mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.HALT, ""));
 
         if (debug) {
-            System.out.println("COMPILATION:\n");
-            printCompilerDebug();
+            prepareCompilerDebug();
+            debugMessages.forEach(System.out::println);
+        } else {
+            debugMessages.clear();
+            debugMessages.add("Debug is disabled");
         }
     }
 
@@ -135,21 +140,11 @@ public class ZorthTranslator {
         }
 
         if (debug) {
-            System.out.println("\nLINKAGE:\n");
-            System.out.println("\nFunction table:");
-            functionAddressTable.forEach((e, integer) -> {
-                System.out.println(e.getKey() + ", size:" + e.getValue() + ", address:" + integer);
-            });
-            System.out.println("\nLiteral table:");
-            literalAddressTable.forEach((aLong, integer) -> {
-                System.out.println(aLong + ", address:" + integer);
-            });
-            System.out.println("\nVar table:");
-            variableAddressTable.forEach((string, integer) -> {
-                System.out.println(string + ", address:" + integer);
-            });
-            System.out.println("\nProgram:");
-            program.forEach(ins -> System.out.println(ins.getKey().getMnemonic() + " " + ins.getValue()));
+            prepareLinkerDebug();
+            debugMessages.forEach(System.out::println);
+        } else {
+            debugMessages.clear();
+            debugMessages.add("Debug is disabled");
         }
     }
 
@@ -218,23 +213,30 @@ public class ZorthTranslator {
         }
     }
 
-    private void printCompilerDebug() {
-        System.out.println("Compiled main:");
-        mainProgram.forEach(ins -> System.out.println(ins.getKey().getMnemonic() + " " + ins.getValue()));
-        System.out.println("Compiled functions:");
-        functionsProgram.forEach(ins -> System.out.println(ins.getKey().getMnemonic() + " " + ins.getValue()));
-        System.out.println("\nFunction table:");
-        functionAddressTable.forEach((e, integer) -> {
-            System.out.println(e.getKey() + ", size:" + e.getValue() + ", address:" + integer);
-        });
-        System.out.println("\nLiteral table:");
-        literalAddressTable.forEach((aLong, integer) -> {
-            System.out.println(aLong + ", address:" + integer);
-        });
-        System.out.println("\nVar table:");
-        variableAddressTable.forEach((string, integer) -> {
-            System.out.println(string + ", address:" + integer);
-        });
+    private void prepareCompilerDebug() {
+        debugMessages.add("COMPILATION:\n");
+        debugMessages.add("Compiled main:");
+        mainProgram.forEach(ins -> debugMessages.add(ins.getKey().getMnemonic() + " " + ins.getValue()));
+        debugMessages.add("Compiled functions:");
+        functionsProgram.forEach(ins -> debugMessages.add(ins.getKey().getMnemonic() + " " + ins.getValue()));
+        debugMessages.add("\nFunction table:");
+        functionAddressTable.forEach((e, integer) -> debugMessages.add(e.getKey() + ", size:" + e.getValue() + ", address:" + integer));
+        debugMessages.add("\nLiteral table:");
+        literalAddressTable.forEach((aLong, integer) -> debugMessages.add(aLong + ", address:" + integer));
+        debugMessages.add("\nVar table:");
+        variableAddressTable.forEach((string, integer) -> debugMessages.add(string + ", address:" + integer));
+    }
+
+    private void prepareLinkerDebug() {
+        debugMessages.add("\nLINKAGE:\n");
+        debugMessages.add("\nFunction table:");
+        functionAddressTable.forEach((e, integer) -> debugMessages.add(e.getKey() + ", size:" + e.getValue() + ", address:" + integer));
+        debugMessages.add("\nLiteral table:");
+        literalAddressTable.forEach((aLong, integer) -> debugMessages.add(aLong + ", address:" + integer));
+        debugMessages.add("\nVar table:");
+        variableAddressTable.forEach((string, integer) -> debugMessages.add(string + ", address:" + integer));
+        debugMessages.add("\nProgram:");
+        program.forEach(ins -> debugMessages.add(ins.getKey().getMnemonic() + " " + ins.getValue()));
     }
 
     private void calculatePositionInFile() {
@@ -485,6 +487,10 @@ public class ZorthTranslator {
             mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.LOOP, "loop$" + count));
         }
         return count + 1;
+    }
+
+    public List<String> getDebugMessages() {
+        return Collections.unmodifiableList(debugMessages);
     }
 
     public List<Long> getData() {
