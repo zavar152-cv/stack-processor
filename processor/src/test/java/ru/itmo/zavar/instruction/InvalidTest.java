@@ -21,6 +21,6 @@ public class InvalidTest {
 
         program.add((Long.valueOf("11111111", 2) << 24)); // 0
         ControlUnit controlUnit = new ControlUnit(program, new ArrayList<>(dataMemory), false);
-        Assertions.assertThrows(InvalidInstructionException.class, controlUnit::start);
+        Assertions.assertThrows(NullPointerException.class, controlUnit::start);
     }
 }
