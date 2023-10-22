@@ -1,6 +1,7 @@
 package ru.itmo.zavar.zorth;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.exception.InvalidFunctionNameException;
 import ru.itmo.zavar.exception.InvalidStringException;
@@ -9,6 +10,7 @@ import ru.itmo.zavar.exception.UnknownWordException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -35,7 +37,41 @@ public class ZorthTranslator {
 
     private ArrayList<String> debugMessages = new ArrayList<>();
 
-    public void compile(final boolean debug) {
+    public void compileFromString(final boolean debug, final String text) {
+        ArrayList<String> tokens = new ArrayList<>();
+        try (BufferedReader bufferedReader = new BufferedReader(new StringReader(text))) {
+            while (bufferedReader.ready()) {
+                String line = bufferedReader.readLine();
+                if (line == null) {
+                    throw new IOException();
+                }
+                line = line.replaceAll("//+.*", "");
+                if (!line.isEmpty()) {
+                    List<String> list = Arrays.stream(line.split(" ")).toList();
+                    tokensInLine.add(list.size());
+                    tokens.addAll(list);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (tokens.isEmpty()) {
+            throw new IllegalArgumentException("Text is empty");
+        }
+        ListIterator<String> stringListIterator = tokens.listIterator();
+        parseBase(stringListIterator);
+        mainProgram.add(new AbstractMap.SimpleEntry<>(InstructionCode.HALT, ""));
+
+        if (debug) {
+            prepareCompilerDebug();
+            debugMessages.forEach(System.out::println);
+        } else {
+            debugMessages.clear();
+            debugMessages.add("Debug is disabled");
+        }
+    }
+
+    public void compileFromFile(final boolean debug) {
         ArrayList<String> tokens = new ArrayList<>();
         try (BufferedReader bufferedReader = Files.newBufferedReader(inputFilePath)) {
             while (bufferedReader.ready()) {
@@ -211,6 +247,27 @@ public class ZorthTranslator {
                 }
             });
         }
+    }
+
+    public ProgramAndDataDto getCompiledProgramAndDataInBytes() {
+        ArrayList<Byte[]> programInBytes = new ArrayList<>();
+        final int addrShift = 24;
+        program.forEach(entry -> {
+            byte[] bytes;
+            if (!entry.getValue().isEmpty()) {
+                bytes = InstructionCode.longToBytes((entry.getKey().getBinary().longValue() << addrShift) + Integer.parseInt(entry.getValue()));
+            } else {
+                bytes = InstructionCode.longToBytes((entry.getKey().getBinary().longValue() << addrShift));
+            }
+            programInBytes.add(ArrayUtils.toObject(bytes));
+        });
+
+        ArrayList<Byte[]> dataInBytes = new ArrayList<>();
+        data.forEach(aLong -> {
+            byte[] bytes = InstructionCode.longToBytes(aLong);
+            dataInBytes.add(ArrayUtils.toObject(bytes));
+        });
+        return new ProgramAndDataDto(programInBytes, dataInBytes);
     }
 
     private void prepareCompilerDebug() {

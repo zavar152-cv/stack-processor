@@ -50,7 +50,7 @@ public final class Translator {
         boolean debug = Boolean.parseBoolean(cmd.getOptionValue("debug"));
 
         zorthTranslator = new ZorthTranslator(Path.of(inputFilePath), Path.of(outputFilePath), outputFormat.equals("bin"));
-        zorthTranslator.compile(debug);
+        zorthTranslator.compileFromFile(debug);
         zorthTranslator.linkage(debug);
         zorthTranslator.saveProgramAndData();
     }
