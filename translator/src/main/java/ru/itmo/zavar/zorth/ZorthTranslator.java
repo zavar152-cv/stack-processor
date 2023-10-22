@@ -43,7 +43,7 @@ public class ZorthTranslator {
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
                 if (line == null) {
-                    throw new IOException();
+                    break;
                 }
                 line = line.replaceAll("//+.*", "");
                 if (!line.isEmpty()) {
