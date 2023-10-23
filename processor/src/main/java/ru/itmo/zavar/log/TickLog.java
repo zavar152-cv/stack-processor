@@ -4,7 +4,8 @@ import org.apache.commons.text.StringEscapeUtils;
 import ru.itmo.zavar.InstructionCode;
 import ru.itmo.zavar.comp.Stage;
 
-public record TickLog(Long controlUnitTicks, Byte tc, Stage stage, Long cr, InstructionCode instructionCode, Integer ip, Integer ar, Long tos,
+public record TickLog(Long controlUnitTicks, Byte tc, Stage stage, Long cr, InstructionCode instructionCode, Integer ip,
+                      Integer ar, Long tos,
                       Long ds, Long rs, String out, String in) {
     public void print() {
         System.out.print("Tick: " + controlUnitTicks);
@@ -19,5 +20,21 @@ public record TickLog(Long controlUnitTicks, Byte tc, Stage stage, Long cr, Inst
         System.out.print(", RS: " + rs);
         System.out.print(", OUT: " + StringEscapeUtils.escapeJava(out));
         System.out.println(", IN: " + StringEscapeUtils.escapeJava(in));
+    }
+
+    @Override
+    public String toString() {
+        return "Tick: " + controlUnitTicks
+                + ", TC: " + tc
+                + ", Stage: " + stage
+                + ", CR: " + cr + " {"
+                + instructionCode + "}"
+                + ", IP: " + ip
+                + ", AR: " + ar
+                + ", TOS: " + tos
+                + ", DS: " + ds
+                + ", RS: " + rs
+                + ", OUT: " + StringEscapeUtils.escapeJava(out)
+                + ", IN: " + StringEscapeUtils.escapeJava(in);
     }
 }
