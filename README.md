@@ -1,14 +1,5 @@
 # **Стековый процессор**
 
-- Абузов Ярослав Александрович P33302
-- `forth | stack | harv | hw | tick | binary | stream | mem | prob1`
-
-![GitLab CI](https://img.shields.io/badge/gitlab%20ci-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white)
-![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=java&logoColor=white)
-
-[![pipeline status](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/badges/master/pipeline.svg)](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/commits/master)
-[![coverage report](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/badges/master/coverage.svg)](https://gitlab.se.ifmo.ru/Zavar30/stack-processor/-/commits/master)
-
 ## **Язык программирования**
 
 Форма Бэкуса-Наура для языка Zorth (Forth + Zavar30):
@@ -693,9 +684,3 @@ Tick: 161, TC: 1, Stage: EXECUTE, CR: 671088640 {FT}, IP: 3, AR: 1, TOS: 1, DS: 
 Input device with address 1 is out of tokens
 Output from processor: foo\n
 ```
-
-| ФИО | алг. | LoC | code байт | code инстр. | инстр. | такт. | вариант |
-|-----|------|-----|-----------|-------------|--------|-------|---------|
-| Абузов Ярослав Александрович | hello |  1  |  148      |             |  37    |  232  | `forth | stack | harv | hw | tick | binary | stream | mem | prob1`        |
-| Абузов Ярослав Александрович | cat   |  5  |  28       |             |  27    |  161  | `forth | stack | harv | hw | tick | binary | stream | mem | prob1`        |
-| Абузов Ярослав Александрович | prob1 | 13  |  164      |             |  41    |  372  |  `forth | stack | harv | hw | tick | binary | stream | mem | prob1`       |
