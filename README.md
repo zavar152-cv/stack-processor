@@ -1,5 +1,7 @@
 # **Стековый процессор**
 
+![Java Version](https://img.shields.io/badge/java-17%2B-blue.svg)
+
 ## **Язык программирования**
 
 Форма Бэкуса-Наура для языка Zorth (Forth + Zavar30):
